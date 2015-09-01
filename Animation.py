@@ -47,7 +47,7 @@ class Animation:
 		return cfg.getint('animation', 'hold')
 
 	def __init__(self, screen, folder, interval = None, autoplay = True):
-		if folder[:1] != '/':
+		if folder[:-1] != '/':
 			folder = folder + '/'
 		
 		self.folder = folder
