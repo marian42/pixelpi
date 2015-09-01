@@ -57,6 +57,10 @@ class Animation:
 			if self.is_single_file():
 				self.load_single()
 			else: self.load_frames()
+			
+			if len(self.frames) == 0:
+				raise Exception('No frames found in animation ' + self.folder)
+			
 			self.screen.pixel = self.frames[0]
 		except Exception:
 			print('Failed to load ' + folder)

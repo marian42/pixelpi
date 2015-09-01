@@ -8,8 +8,14 @@ class Cycle:
 		if location[:1] != '/':
 			location = location + '/'
 		
+		if not os.path.exists(location):
+			raise Exception("Path " + location + " not found")
 		subfolders = [x[0] for x in os.walk(location)]
-		self.subfolders = subfolders[1:]
+		
+		self.subfolders = subfolders[1:]		
+
+		if len(self.subfolders) == 0:
+			raise Exception("No animations found in " + location)		
 		
 		self.animations = [None for i in range(len(self.subfolders))]
 		self.current = None
