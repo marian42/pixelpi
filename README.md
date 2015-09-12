@@ -23,6 +23,8 @@ Here is a [set of photos](https://imgur.com/a/Ql25S) of the hardware I use and a
 - Plywood 1 €
 - Wire, solder, connectors, heat shrink tube, etc
 
+(131€ total, about $150)
+
 ### LED strips
 
 I recommend you use [this tutorial](https://learn.adafruit.com/neopixels-on-raspberry-pi/overview) to set up the LED hardware.
