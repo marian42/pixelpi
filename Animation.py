@@ -1,9 +1,11 @@
-from Screen import *
 import os.path
 import pygame.image
 import time
 from thread import start_new_thread
 import ConfigParser
+import collections
+
+Color = collections.namedtuple('Color', 'r g b')
 
 def int_to_color(c):
 	b =  c & 255
