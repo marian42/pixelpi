@@ -1,10 +1,20 @@
-from Animation import *
+from animation import *
 import time
 import os
 import random
 
-class Cycle:
+class Cycle(Module):
 	def __init__(self, screen, location, interval = 20000):
+		super(Cycle, self).__init__(screen)
+		
+		self.subfolders = self.load_subfolders(location)
+
+		self.animations = [None for i in range(len(self.subfolders))]
+		self.current = None
+		
+		self.interval = interval
+
+	def load_subfolders(self, location):
 		if location[:1] != '/':
 			location = location + '/'
 		
@@ -12,16 +22,12 @@ class Cycle:
 			raise Exception("Path " + location + " not found")
 		subfolders = [x[0] for x in os.walk(location)]
 		
-		self.subfolders = subfolders[1:]		
+		subfolders = subfolders[1:]
 
-		if len(self.subfolders) == 0:
-			raise Exception("No animations found in " + location)		
-		
-		self.animations = [None for i in range(len(self.subfolders))]
-		self.current = None
-		
-		self.screen = screen
-		self.interval = interval
+		if len(subfolders) == 0:
+			raise Exception("No animations found in " + location)
+
+		return subfolders
 		
 	def next(self):
 		if self.current != None:
@@ -35,15 +41,7 @@ class Cycle:
 		self.current = self.animations[index]
 		self.current.start()
 		
-	def run(self):
-		while True:
-			self.next()
-			time.sleep(self.interval / 1000.0)
-			
-if __name__ == '__main__':
-	import sys
-
-	screen = Screen()
-	cycle = Cycle(screen, sys.argv[1] if len(sys.argv) > 1 else 'animations')
-	cycle.run()
+	def tick(self):
+		self.next()
+		time.sleep(self.interval / 1000.0)
 		

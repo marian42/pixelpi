@@ -3,8 +3,8 @@ use_virtual_screen = True
 
 def create_screen():
 	if use_virtual_screen:
-		from virtualscreen import VirtualScreen
+		from screen.virtualscreen import VirtualScreen
 		return VirtualScreen()
 	else:
-		from Screen import Screen
+		from screen.screen import Screen
 		return Screen()

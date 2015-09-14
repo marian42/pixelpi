@@ -1,17 +1,16 @@
-from Screen import *
 import collections
 import random
 import time
 import datetime
 import os
-from gamepad import *
 import math
+from helpers import *
+from module import Module
 
-Point = collections.namedtuple('Point', 'x y')
-
-class Clock:
-	def __init__(self, sceen):
-		self.screen = screen		
+class Clock(Module):
+	def __init__(self, screen):
+		super(Clock, self).__init__(screen)
+		
 	
 	def draw_digit(self, digit, pos, color):
 		if digit in [0, 2, 3, 4, 5, 6, 7, 8, 9]:
@@ -65,18 +64,8 @@ class Clock:
 		self.draw_time(Color(255, 255, 255), colon)
 		self.screen.update()
 	
-	def run(self):
-		self.draw(colon = True)
-		while True:
-			self.draw(False)
-			time.sleep(0.5)
-			self.draw(True)
-			time.sleep(0.5)
-
-
-
-			
-if __name__ == '__main__':
-	screen = Screen()
-	clock = Clock(screen)
-	clock.run()
+	def tick(self):
+		self.draw(False)
+		time.sleep(0.5)
+		self.draw(True)
+		time.sleep(0.5)
