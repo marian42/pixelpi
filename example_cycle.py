@@ -1,7 +1,3 @@
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.realpath('')))
-
 import pygame
 from modules.cycle import Cycle
 from screenfactory import create_screen
