@@ -78,14 +78,13 @@ class Animation(Module):
 		return cfg.getint('animation', 'hold')
 
 	def tick(self):
-		while self.running:
-			self.pos += 1
-			if self.pos >= len(self.frames):
-				self.pos = 0
-			self.screen.pixel = self.frames[self.pos]
-			self.screen.update()
-			time.sleep(self.interval / 1000.0)
-			
+		self.pos += 1
+		if self.pos >= len(self.frames):
+			self.pos = 0
+		self.screen.pixel = self.frames[self.pos]
+		self.screen.update()
+		time.sleep(self.interval / 1000.0)
+		
 	def on_start(self):
 		print('Starting ' + self.folder)
 
