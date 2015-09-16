@@ -1,10 +1,10 @@
-from Screen import *
 import collections
 import random
 import time
 import os
-from gamepad import *
 import math
+from helpers import *
+from module import *
 
 Point = collections.namedtuple('Point', 'x y')
 
@@ -14,23 +14,19 @@ def random_color():
 		color = [random.choice([0, 255]) for i in range(3)]
 	return Color(color[0], color[1], color[2])
 
-def int_to_color(c):
-	b =  c & 255
-	g = (c >> 8) & 255
-	r = (c >> 16) & 255
-	return (r, g, b)
-
-class Snake:
-	def __init__(self, sceen):
-		self.screen = screen
+class Snake(Module):
+	def __init__(self, screen, gamepad):
+		super(Snake, self).__init__(screen)
+		self.gamepad = gamepad
+		
 		self.snake = [Point(screen.width / 2, screen.height / 2)]
 		self.dir = Point(0, -1)
 		
 		self.interval = 0.15
 	
 		self.new_game()
-		self.gamepad = Gamepad()
 		self.gamepad.on_press = self.on_key_down
+		self.start()
 		
 		
 	def new_game(self):
@@ -38,18 +34,16 @@ class Snake:
 		self.head_color = random_color()
 		while self.food_color == self.head_color:
 			self.head_color = random_color()
-		self.food_color_rgb = int_to_color(self.food_color)
 
-		self.snake = [Point(screen.width / 2, screen.height / 2)]
+		self.snake = [Point(self.screen.width / 2, self.screen.height / 2)]
 		self.dir = Point(0, -1)
 		self.last_food = None
 		
 		t = 1
 		start = time.clock()
-		rgb = int_to_color(self.head_color)
 		while time.clock() < start + t:
 			self.screen.clear()
-			self.screen.pixel[self.snake[0].x][self.snake[0].y] = Color(int(rgb[0] * (time.clock() - start)**2 / t), int(rgb[1] * (time.clock() - start)**2 / t), int(rgb[2] * (time.clock() - start)**2 / t))
+			self.screen.pixel[self.snake[0].x][self.snake[0].y] = Color(int(self.head_color.r * (time.clock() - start)**2 / t), int(self.head_color.g * (time.clock() - start)**2 / t), int(self.head_color.b * (time.clock() - start)**2 / t))
 			self.screen.update()
 		
 		self.next_step = time.clock() + self.interval
@@ -67,10 +61,9 @@ class Snake:
 			
 		t = 4
 		start = time.clock()
-		rgb = int_to_color(self.head_color)
 		while time.clock() < start + t:
 			self.screen.clear()
-			self.screen.pixel[self.snake[0].x][self.snake[0].y] = Color(int(rgb[0] * (1 - (time.clock() - start) / t)**2), int(rgb[1] * (1 - (time.clock() - start) / t)**2), int(rgb[2] * (1 - (time.clock() - start) / t)**2))
+			self.screen.pixel[self.snake[0].x][self.snake[0].y] = Color(int(self.head_color.r * (1 - (time.clock() - start) / t)**2), int(self.head_color.g * (1 - (time.clock() - start) / t)**2), int(self.head_color.b * (1 - (time.clock() - start) / t)**2))
 			self.screen.update()
 	
 		self.new_game()
@@ -109,9 +102,9 @@ class Snake:
 						d = ((x - self.last_food.x)** 2 + (y - self.last_food.y)**2) ** 0.5
 						if (d / radius)**0.5 < (time.clock() - self.pulse_offset) / t:
 							self.screen.pixel[x][y] = Color(
-								max(0, int(self.food_color_rgb[0] * 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)),
-								max(0, int(self.food_color_rgb[1] * 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)),
-								max(0, int(self.food_color_rgb[2] * 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)))
+								max(0, int(self.food_color.r * 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)),
+								max(0, int(self.food_color.g * 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)),
+								max(0, int(self.food_color.b * 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)))
 		
 		for p in self.snake:
 			self.screen.pixel[p.x][p.y] = Color(255, 255, 255)
@@ -119,22 +112,21 @@ class Snake:
 		
 		if self.food != None:
 			self.screen.pixel[self.food.x][self.food.y] = Color(
-				int(self.food_color_rgb[0] * math.sin((time.clock() - self.pulse_offset) * 8) ** 2),
-				int(self.food_color_rgb[1] * math.sin((time.clock() - self.pulse_offset) * 8) ** 2),
-				int(self.food_color_rgb[2] * math.sin((time.clock() - self.pulse_offset) * 8) ** 2))
+				int(self.food_color.r * math.sin((time.clock() - self.pulse_offset) * 8) ** 2),
+				int(self.food_color.g * math.sin((time.clock() - self.pulse_offset) * 8) ** 2),
+				int(self.food_color.b * math.sin((time.clock() - self.pulse_offset) * 8) ** 2))
 		
 		self.screen.update()
 		
-	def run(self):
-		while True:
-			if self.next_step < time.clock():				
-				self.move()
-				if self.gamepad.button[1]:
-					self.next_step += self.interval / 3
-				else: self.next_step += self.interval
-			self.draw()
-			time.sleep(0.01)
-			
+	def tick(self):
+		if self.next_step < time.clock():				
+			self.move()
+			if self.gamepad.button[1]:
+				self.next_step += self.interval / 3
+			else: self.next_step += self.interval
+		self.draw()
+		time.sleep(0.01)
+		
 	def on_key_down(self, key):
 		next = self.dir
 		if key == self.gamepad.UP:
@@ -151,8 +143,3 @@ class Snake:
 		
 		if len(self.snake) == 1 or self.snake[0].x + next.x != self.snake[1].x or self.snake[0].y + next.y != self.snake[1].y:
 			self.dir = next
-			
-if __name__ == '__main__':
-	screen = Screen()
-	snake = Snake(screen)
-	snake.run()
