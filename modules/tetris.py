@@ -1,4 +1,3 @@
-from Screen import *
 import collections
 import random
 import time
@@ -8,16 +7,9 @@ import thread
 import math
 
 from thread import start_new_thread
-from gamepad import *
-from Animation import *
+from modules.animation import *
 
-Point = collections.namedtuple('Point', 'x y')
-
-def int_to_color(c):
-	b =  c & 255
-	g = (c >> 8) & 255
-	r = (c >> 16) & 255
-	return (r, g, b)
+from helpers import *
 
 class Particle:
 	def __init__(self, x, y, color):
@@ -57,7 +49,7 @@ class Tetromino:
 					blocks.append(Point(self.height - y - 1, x))
 		return Tetromino(blocks, self.color)
 
-class Tetris:
+class Tetris(Module):
 	tetrominos = [
 		Tetromino([Point(0,0), Point(1,0), Point(2,0), Point(3,0)], Color(0, 255, 255)),
 		Tetromino([Point(0,0), Point(1,0), Point(0,1), Point(1,1)], Color(255, 255, 0)),
@@ -70,19 +62,21 @@ class Tetris:
 	
 	COOLDOWN = 0.03
 
-	def __init__(self, sceen):
-		self.screen = screen
+	def __init__(self, screen, gamepad):
+		super(Tetris, self).__init__(screen)
+		self.gamepad = gamepad
+		
 		self.level_width = 10
 		self.level_height = 16
 		
 		self.draw_lock = thread.allocate_lock()
 		self.game_lock = thread.allocate_lock()
 		
-		self.gamepad = Gamepad()
 		self.gamepad.on_press = self.enqueue_key
 		self.lastinput = 0
 		
 		self.new_game()
+		self.start()
 		
 	def new_game(self):
 		self.score = 0
@@ -116,7 +110,7 @@ class Tetris:
 			pos = Point(pos.x, pos.y + 1)
 		
 		f = 0.03
-		color = Color(int(int_to_color(self.current_tetromino.color)[0] * f), int(int_to_color(self.current_tetromino.color)[1] * f), int(int_to_color(self.current_tetromino.color)[2] * f))
+		color = Color(int(self.current_tetromino.color.r * f), int(self.current_tetromino.color.g * f), int(self.current_tetromino.color.b * f))
 		for x in range(self.current_tetromino.width):
 			for y in range(self.current_tetromino.height):
 				if self.current_tetromino.map[x][y]:
@@ -220,16 +214,15 @@ class Tetris:
 			if not self.fits(self.current_tetromino, self.tetromino_pos):
 				self.game_over()
 	
-	def run(self):
-		while True:
-			if time.clock() > self.next_step:
-				with self.game_lock:				
-					self.step()
-				self.draw_and_update()
-				self.next_step += 0.12
-			self.check_key_queue()
-			self.check_keys()
-			time.sleep(0.001)
+	def tick(self):
+		if time.clock() > self.next_step:
+			with self.game_lock:
+				self.step()
+			self.draw_and_update()
+			self.next_step += 0.12
+		self.check_key_queue()
+		self.check_keys()
+		time.sleep(0.001)
 
 	def enqueue_key(self, button):
 		self.key_queue.append(button)
@@ -322,9 +315,4 @@ class Tetris:
 				if keydown:
 					self.lastinput += self.COOLDOWN	* 1.5
 				self.draw_and_update()
-
-if __name__ == '__main__':
-	screen = Screen()
-	tetris = Tetris(screen)
-	tetris.run()
 	
