@@ -234,7 +234,7 @@ class Tetris(Module):
 			
 	def on_key_down(self, button):
 		with self.game_lock:
-			if button == 4:
+			if button == 4 or button == self.gamepad.UP:
 				center = Point(self.tetromino_pos.x + self.current_tetromino.width / 2, self.tetromino_pos.y + self.current_tetromino.height / 2)
 				rotated = self.current_tetromino.rotate()
 				new_pos = Point(center.x - rotated.width / 2, center.y - rotated.height / 2)
