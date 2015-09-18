@@ -42,6 +42,8 @@ class Snake(Module):
 		t = 1
 		start = time.clock()
 		while time.clock() < start + t:
+			if not self.running:
+				return
 			self.screen.clear()
 			self.screen.pixel[self.snake[0].x][self.snake[0].y] = Color(int(self.head_color.r * (time.clock() - start)**2 / t), int(self.head_color.g * (time.clock() - start)**2 / t), int(self.head_color.b * (time.clock() - start)**2 / t))
 			self.screen.update()
@@ -55,6 +57,8 @@ class Snake(Module):
 		self.draw()
 		time.sleep(2)
 		while len(self.snake) > 1:
+			if not self.running:
+				return
 			self.snake = self.snake[:-1]
 			self.draw()
 			time.sleep(0.12)
@@ -62,6 +66,8 @@ class Snake(Module):
 		t = 4
 		start = time.clock()
 		while time.clock() < start + t:
+			if not self.running:
+				return
 			self.screen.clear()
 			self.screen.pixel[self.snake[0].x][self.snake[0].y] = Color(int(self.head_color.r * (1 - (time.clock() - start) / t)**2), int(self.head_color.g * (1 - (time.clock() - start) / t)**2), int(self.head_color.b * (1 - (time.clock() - start) / t)**2))
 			self.screen.update()

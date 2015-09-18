@@ -20,8 +20,14 @@ class Module(object):
 		self.running = True
 		start_new_thread(self.run, ())
 
-		if getattr(self, "on_start", None) != None and callable(getattr(self, "on_start", None)):
-			self.on_start()
+		self.on_start()
  		
 	def stop(self):
 		self.running = False
+		self.on_stop()
+
+	def on_start(self):
+		pass
+
+	def on_stop(self):
+		pass

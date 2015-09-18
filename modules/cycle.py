@@ -44,4 +44,8 @@ class Cycle(Module):
 	def tick(self):
 		self.next()
 		time.sleep(self.interval / 1000.0)
+
+	def on_stop(self):
+		if self.current != None:
+			self.current.stop()
 		

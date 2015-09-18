@@ -166,6 +166,9 @@ class Tetris(Module):
 		detach_next = time.clock()
 
 		while line >= 0 or len(particles) > 0:
+			if not self.running:
+				return
+
 			now = time.clock()
 			dt = now - last
 			last = now
