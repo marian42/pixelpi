@@ -6,8 +6,6 @@ import math
 from helpers import *
 from module import *
 
-Point = collections.namedtuple('Point', 'x y')
-
 def random_color():
 	color = []
 	while not 0 in color or not 255 in color:
