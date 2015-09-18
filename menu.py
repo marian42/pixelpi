@@ -94,7 +94,6 @@ class Menu(object):
 			self.move(-1)
 		if key == 1:
 			self.launch()
-		self.draw()
 
 	def stop(self):
 		self.module.stop()
