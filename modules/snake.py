@@ -26,8 +26,6 @@ class Snake(Module):
 	
 		self.new_game()
 		self.gamepad.on_press.append(self.on_key_down)
-		self.start()
-		
 		
 	def new_game(self):
 		self.food_color = random_color()
@@ -42,8 +40,6 @@ class Snake(Module):
 		t = 1
 		start = time.clock()
 		while time.clock() < start + t:
-			if not self.running:
-				return
 			self.screen.clear()
 			self.screen.pixel[self.snake[0].x][self.snake[0].y] = Color(int(self.head_color.r * (time.clock() - start)**2 / t), int(self.head_color.g * (time.clock() - start)**2 / t), int(self.head_color.b * (time.clock() - start)**2 / t))
 			self.screen.update()
