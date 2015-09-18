@@ -13,9 +13,9 @@ class Menu(object):
 		self.gamepad = create_gamepad()
 		self.gamepad.on_press.append(self.on_key_down)
 
-		self.index = 0
-		
-		self.items = items		
+		self.index = 0		
+		self.items = items
+		self.module = None		
 
 		self.reset(redraw = False)
 		self.resume_animation()
@@ -47,6 +47,9 @@ class Menu(object):
 
 
 	def draw(self):
+		if self.module != None:
+			return
+
 		self.screen.clear()
 		self.draw_scrollbar()
 
@@ -80,16 +83,31 @@ class Menu(object):
 		self.end = self.start + 0.3
 
 	def on_key_down(self, key):
+		if self.module != None:
+			if key == 10:
+				self.stop()
+			return
+
 		if key == self.gamepad.RIGHT:
 			self.move(1)
 		if key == self.gamepad.LEFT:
 			self.move(-1)
 		if key == 1:
-			self.start_animation()
-			self.resume_animation()
-		if key == 2:
-			self.resume_animation()
+			self.launch()
 		self.draw()
+
+	def stop(self):
+		self.module.stop()
+		pygame.time.wait(200)
+		self.module = None
+		self.resume_animation()
+		self.gamepad.on_press = [self.on_key_down]
+		self.gamepad.on_release = []
+
+	def launch(self):
+		self.start_animation()
+		self.module = self.items[self.index].get_module(self.screen, self.gamepad)
+		self.module.start()
 
 	def start_animation(self):
 		start = time.clock()
@@ -102,7 +120,7 @@ class Menu(object):
 			pygame.time.wait(20)
 
 		pygame.time.wait(100)
-		self.reset()
+		self.reset(redraw = False)
 
 	def resume_animation(self):
 		start = time.clock()

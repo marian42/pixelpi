@@ -25,17 +25,33 @@ class CycleItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/cycle.bmp')
 
+	def get_module(self, screen, gamepad):
+		from modules.cycle import Cycle
+		return Cycle(screen, 'animations')
+
 class TetrisItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/tetris.bmp')
+
+	def get_module(self, screen, gamepad):
+		from modules.tetris import Tetris
+		return Tetris(screen, gamepad)
 
 class SnakeItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/snake.bmp')
 
+	def get_module(self, screen, gamepad):
+		from modules.snake import Snake
+		return Snake(screen, gamepad)
+
 class ClockItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/clock.bmp')
+
+	def get_module(self, screen, gamepad):
+		from modules.clock import Clock
+		return Clock(screen)
 
 menu_items = [
 	CycleItem(),
