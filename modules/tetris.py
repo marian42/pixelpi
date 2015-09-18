@@ -72,7 +72,7 @@ class Tetris(Module):
 		self.draw_lock = thread.allocate_lock()
 		self.game_lock = thread.allocate_lock()
 		
-		self.gamepad.on_press = self.enqueue_key
+		self.gamepad.on_press.append(self.enqueue_key)
 		self.lastinput = 0
 		
 		self.new_game()

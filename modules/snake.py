@@ -25,7 +25,7 @@ class Snake(Module):
 		self.interval = 0.15
 	
 		self.new_game()
-		self.gamepad.on_press = self.on_key_down
+		self.gamepad.on_press.append(self.on_key_down)
 		self.start()
 		
 		

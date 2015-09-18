@@ -11,7 +11,7 @@ class Menu(object):
 	def __init__(self, items):
 		self.screen = create_screen()
 		self.gamepad = create_gamepad()
-		self.gamepad.on_press = self.on_key_down
+		self.gamepad.on_press.append(self.on_key_down)
 
 		self.index = 0
 		

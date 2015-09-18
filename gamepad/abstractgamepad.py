@@ -10,19 +10,19 @@ class AbstractGamepad(object):
 		self.verbose = verbose
 		self.button = [False for i in range(self.btn_count)]
 		
-		self.on_press = None
-		self.on_release = None
+		self.on_press = []
+		self.on_release = []
 		
 	def press(self, btn):
 		self.button[btn] = True
 		if self.verbose:
 			print('Pressed ' + str(btn))
-		if self.on_press != None:
-			self.on_press(btn)
+		for callback in self.on_press:
+			callback(btn)
 		
 	def release(self, btn):
 		self.button[btn] = False
 		if self.verbose:
 			print('Released ' + str(btn))
-		if self.on_release != None:
-			self.on_release(btn)
+		for callback in self.on_release:
+			callback(btn)
