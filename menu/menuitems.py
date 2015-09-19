@@ -45,6 +45,14 @@ class SnakeItem(MenuItem):
 		from modules.snake import Snake
 		return Snake(screen, gamepad)
 
+class PacmanItem(MenuItem):
+	def __init__(self):
+		self.preview = MenuItem.load_preview('menu/preview/pacman.bmp')
+
+	def get_module(self, screen, gamepad):
+		from modules.pacman import Pacman
+		return Pacman(screen, gamepad)
+
 class ClockItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/clock.bmp')
@@ -57,5 +65,6 @@ menu_items = [
 	CycleItem(),
 	TetrisItem(),
 	SnakeItem(),
+	PacmanItem(),
 	ClockItem()
 ]
