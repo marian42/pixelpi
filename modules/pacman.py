@@ -6,6 +6,7 @@ import math
 from helpers import *
 from module import *
 import random
+from modules.animation import Animation
 
 class Ghost(object):
 	ROAM = 0
@@ -180,7 +181,7 @@ class Pacman(Module):
 				if self.walls[y][x] == 1:
 					self.screen.pixel[x][y] = self.wall_color
 	
-	def draw(self):
+	def draw(self, update = True):
 		self.screen.clear()
 		self.draw_walls()
 
@@ -193,13 +194,14 @@ class Pacman(Module):
 		for i in range(self.lives):
 			self.screen.pixel[1 + 2 * i][15] = self.pacman_color
 
-		brightness = 0.2 + 0.8 * math.sin(time.clock() / self.step_interval / 2 * math.pi + 0.5 * math.pi)**2
-		self.screen.pixel[self.pacman.x][self.pacman.y] = Color(self.pacman_color.r * brightness, self.pacman_color.g * brightness, self.pacman_color.b * brightness)
-
 		for ghost in self.ghosts:
 			ghost.draw()
 
-		self.screen.update()
+		brightness = 0.2 + 0.8 * math.sin(time.clock() / self.step_interval / 2 * math.pi + 0.5 * math.pi)**2
+		self.screen.pixel[self.pacman.x][self.pacman.y] = Color(self.pacman_color.r * brightness, self.pacman_color.g * brightness, self.pacman_color.b * brightness)
+
+		if update:
+			self.screen.update()
 
 	def get_nex_step(self, direction):
 		return Point((self.pacman.x + direction.x + 16) % 16, (self.pacman.y + direction.y + 16) % 16)
@@ -228,8 +230,31 @@ class Pacman(Module):
 			self.new_level()
 
 	def die(self):
+		self.draw(update = False)
+		self.screen.pixel[self.pacman.x][self.pacman.y] = self.pacman_color
+		self.screen.update()
+
+		time.sleep(1)
+		start = time.clock()
+		end = start + 1.5
+
+		while time.clock() < end:
+			self.draw(update = False)
+			brightness = (end - time.clock()) / (end - start)
+			self.screen.pixel[self.pacman.x][self.pacman.y] = Color(self.pacman_color.r * brightness, self.pacman_color.g * brightness, self.pacman_color.b * brightness)
+			self.screen.update()
+
+		time.sleep(1)
+		animation = Animation(self.screen, "pacman/die", interval = 100, autoplay = False)
+		animation.play_once()
+		time.sleep(0.5)
+		
 		self.lives -= 1
 		self.new_level()
+		self.draw()
+		self.next_step += 0.5
+		time.sleep(0.5)
+		
 
 	def check_ghosts(self):
 		for ghost in self.ghosts:
