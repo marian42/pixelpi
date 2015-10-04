@@ -29,13 +29,15 @@ class Menu(object):
 
 	def draw_on_screen(self, x, y, zoom, graphic):
 		size = int(8 * zoom)
-		for line in range(size):
-			for pixel in range(size):
-				source = Point(int(pixel / zoom), int(line / zoom))
-				target = Point(int(x - size * 0.5 + pixel), int(y - size * 0.5 + line))
-				if target.x >= 0 and target.x < 16 and target.y >= 0 and target.y < 16:
+		
+		if zoom == 0:
+			return
+		for target_x in range(16):
+			for target_y in range(16):
+				source = Point(int((target_x - x) / zoom + 4), int((target_y - y) / zoom + 4))
+				if source.x >= 0 and source.y >= 0 and source.x < 8 and source.y < 8:
 					c = graphic[source.x][source.y]
-					self.screen.pixel[target.x][target.y] = Color(c.r * self.brightness, c.g * self.brightness, c.b * self.brightness)
+					self.screen.pixel[target_x][target_y] = Color(c.r * self.brightness, c.g * self.brightness, c.b * self.brightness)
 
 	def draw_scrollbar(self):
 		size = int(math.floor(16 / len(self.items)))
@@ -116,7 +118,6 @@ class Menu(object):
 			self.zoom = 1 + 16 * ((time.clock() - start) / (end - start)) ** 2
 			self.brightness = min(1, 1 - ((time.clock() - start) / (end - start)))
 			self.draw()
-			pygame.time.wait(20)
 
 		pygame.time.wait(100)
 		self.reset(redraw = False)
@@ -130,7 +131,6 @@ class Menu(object):
 			self.brightness = min(1, 1 * ((time.clock() - start) / (end - start)))
 			
 			self.draw()
-			pygame.time.wait(20)
 
 		self.reset()
 
