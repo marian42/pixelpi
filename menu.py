@@ -92,7 +92,7 @@ class Menu(object):
 			self.move(1)
 		if key == self.gamepad.LEFT:
 			self.move(-1)
-		if key == 1:
+		if key == 2:
 			self.launch()
 
 	def stop(self):
