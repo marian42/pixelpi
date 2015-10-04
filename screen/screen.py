@@ -10,7 +10,6 @@ class Screen:
 		self.strip.begin()
 		
 		self.pixel = [[Color(0,0,0) for y in range(height)] for x in range(width)]
-		pygame.init()
 		
 	def clear(self, color = Color(0,0,0)):
 		for x in range(self.width):

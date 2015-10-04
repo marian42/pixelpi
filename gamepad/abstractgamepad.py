@@ -26,3 +26,6 @@ class AbstractGamepad(object):
 			print('Released ' + str(btn))
 		for callback in self.on_release:
 			callback(btn)
+
+	def tick(self):
+		pass

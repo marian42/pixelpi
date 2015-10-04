@@ -2,7 +2,6 @@ from menu.menuitems import menu_items
 from screenfactory import create_screen
 from gamepadfactory import create_gamepad
 import pygame
-from gamepad.virtualgamepad import *
 import time
 import math
 from helpers import *
@@ -13,9 +12,9 @@ class Menu(object):
 		self.gamepad = create_gamepad()
 		self.gamepad.on_press.append(self.on_key_down)
 
-		self.index = 0		
+		self.index = 0
 		self.items = items
-		self.module = None		
+		self.module = None
 
 		self.reset(redraw = False)
 		self.resume_animation()
@@ -64,6 +63,7 @@ class Menu(object):
 		return x
 
 	def tick(self):
+		self.gamepad.tick()
 		if (self.dir != 0):
 			self.offset = self.dir * self.ease((1 - (time.clock() - self.start) / (self.end - self.start)))
 			
@@ -139,5 +139,3 @@ if __name__ == '__main__':
 	while True:
 		menu.tick()
 		pygame.time.wait(10)
-		for event in pygame.event.get():
-			instance.consume_event(event)
