@@ -2,7 +2,8 @@
 
 import sys
 import time
-from abstractgamepad import AbstractGamepad;
+from abstractgamepad import AbstractGamepad
+from thread import start_new_thread
 
 class Gamepad(AbstractGamepad):
 	def __init__(self, verbose = False):

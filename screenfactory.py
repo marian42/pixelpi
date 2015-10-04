@@ -1,5 +1,5 @@
 # Use this to switch between virtual and LED screen for examples
-use_virtual_screen = True
+use_virtual_screen = False
 
 def create_screen():
 	if use_virtual_screen:

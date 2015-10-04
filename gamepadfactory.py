@@ -1,5 +1,5 @@
 # Use this to switch between virtual and LED screen for examples
-use_virtual_gamepad = True
+use_virtual_gamepad = False
 
 def create_gamepad():
 	if use_virtual_gamepad:

@@ -1,4 +1,5 @@
 from neopixel import *
+import pygame
 
 class Screen:
 	def __init__(self, width = 16, height = 16, led_pin = 18, led_freq_hz = 800000, led_dma = 5, led_invert = False, led_brightness = 200):
@@ -9,16 +10,22 @@ class Screen:
 		self.strip.begin()
 		
 		self.pixel = [[Color(0,0,0) for y in range(height)] for x in range(width)]
+		pygame.init()
 		
 	def clear(self, color = Color(0,0,0)):
 		for x in range(self.width):
 			for y in range(self.height):
 				self.pixel[x][y] = color
+
+	def color_to_int(self, value):
+		if type(value) is int:
+			return value
+		return Color(int(value.r), int(value.g), int(value.b))
 				
 	def update(self):
 		for y in range(self.height):
 			for x in range(self.width):
 				if y % 2 == 0:
-					self.strip.setPixelColor(y * self.width + x, self.pixel[x][y])
-				else: self.strip.setPixelColor(y * self.width + self.width - 1 - x, self.pixel[x][y])
+					self.strip.setPixelColor(y * self.width + x, self.color_to_int(self.pixel[x][y]))
+				else: self.strip.setPixelColor(y * self.width + self.width - 1 - x, self.color_to_int(self.pixel[x][y]))
 		self.strip.show()
