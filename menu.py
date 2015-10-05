@@ -1,3 +1,5 @@
+import os
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 from menu.menuitems import menu_items
 from screenfactory import create_screen
 from gamepadfactory import create_gamepad
