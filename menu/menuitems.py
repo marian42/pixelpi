@@ -21,6 +21,12 @@ class MenuItem(object):
 
 		return frame
 
+	def on_key_press(self, key, menu):
+		pass
+
+	def is_launchable(self):
+		return True
+
 class CycleItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/cycle.bmp')
@@ -69,11 +75,40 @@ class PieItem(MenuItem):
 		from modules.pie import Pie
 		return Pie(screen)
 
+class BrightnessItem(MenuItem):
+	def __init__(self):
+		self.preview_template = MenuItem.load_preview('menu/preview/brightness.bmp')
+		self.value = 5
+		self.draw()
+
+	def draw(self):
+		self.preview = [self.preview_template[x][:] for x in range(8)]
+		for x in range(8):
+			if self.value > x:
+				self.preview[x][7] = Color(255, 255, 255)
+
+	def is_launchable(self):
+		return False
+
+	def update(self, menu):
+		menu.screen.strip.setBrightness(int(4 + 3.1 * (self.value+1)**2))
+		self.draw()
+		menu.draw()
+
+	def on_key_press(self, key, menu):
+		if key == menu.gamepad.UP:
+			self.value = min(max(0, self.value + 1), 8)
+			self.update(menu)
+		if key == menu.gamepad.DOWN:
+			self.value = min(max(0, self.value - 1), 8)
+			self.update(menu)
+
 menu_items = [
 	CycleItem(),
 	TetrisItem(),
 	SnakeItem(),
 	PacmanItem(),
 	ClockItem(),
-	PieItem()
+	PieItem(),
+	BrightnessItem()
 ]

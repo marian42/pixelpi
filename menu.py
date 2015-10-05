@@ -105,6 +105,8 @@ class Menu(object):
 		if key == 2:
 			self.launch()
 
+		self.items[self.index].on_key_press(key, self)
+
 	def stop(self):
 		self.module.stop()
 		pygame.time.wait(200)
@@ -114,6 +116,8 @@ class Menu(object):
 		self.gamepad.on_release = []
 
 	def launch(self):
+		if self.items[self.index].is_launchable() == False:
+			return
 		self.start_animation()
 		self.module = self.items[self.index].get_module(self.screen, self.gamepad)
 		self.module.start()
