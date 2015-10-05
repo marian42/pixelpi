@@ -61,10 +61,19 @@ class ClockItem(MenuItem):
 		from modules.clock import Clock
 		return Clock(screen)
 
+class PieItem(MenuItem):
+	def __init__(self):
+		self.preview = MenuItem.load_preview('menu/preview/pie.bmp')
+
+	def get_module(self, screen, gamepad):
+		from modules.pie import Pie
+		return Pie(screen)
+
 menu_items = [
 	CycleItem(),
 	TetrisItem(),
 	SnakeItem(),
 	PacmanItem(),
-	ClockItem()
+	ClockItem(),
+	PieItem()
 ]
