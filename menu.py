@@ -27,24 +27,30 @@ class Menu(object):
 		if redraw:
 			self.draw()
 
-	def draw_on_screen(self, x, y, zoom, graphic):
-		size = int(8 * zoom)
-		
+	def draw_on_screen(self, x, y, zoom, graphic):		
 		if zoom == 0:
 			return
+		if self.brightness == 1 and zoom == 1:
+			for source_x in range(8):
+				for source_y in range(8):
+					target = Point(source_x + x - 4, source_y + y - 4)
+					if target.x >= 0 and target.x < 16 and target.y >= 0 and target.y < 16:
+						self.screen.pixel[target.x][target.y] = graphic[source_x][source_y]
+			return
+
 		for target_x in range(16):
 			for target_y in range(16):
 				source = Point(int((target_x - x) / zoom + 4), int((target_y - y) / zoom + 4))
 				if source.x >= 0 and source.y >= 0 and source.x < 8 and source.y < 8:
 					c = graphic[source.x][source.y]
-					self.screen.pixel[target_x][target_y] = Color(c.r * self.brightness, c.g * self.brightness, c.b * self.brightness)
+					self.screen.pixel[target_x][target_y] = Color(int(c.r * self.brightness), int(c.g * self.brightness), int(c.b * self.brightness))
 
 	def draw_scrollbar(self):
 		size = int(math.floor(16 / len(self.items)))
 		start = int(math.floor((16 - size) * self.index / (len(self.items) - 1)))
 
 		for x in range(size):
-			self.screen.pixel[(start + x - int(size * self.offset) + 16) % 16][15] = Color(80 * self.brightness, 80 * self.brightness, 80 * self.brightness)
+			self.screen.pixel[(start + x - int(size * self.offset) + 16) % 16][15] = Color(int(80 * self.brightness), int(80 * self.brightness), int(80 * self.brightness))
 
 
 	def draw(self):
