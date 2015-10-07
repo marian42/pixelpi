@@ -3,7 +3,6 @@ import math
 from helpers import *
 from modules.module import Module
 import serial
-import traceback
 from thread import start_new_thread
 
 class Music(Module):
@@ -27,8 +26,8 @@ class Music(Module):
 				elif self.position < 7:
 					self.data[self.position] = byte
 					self.position += 1
-			except Exception as e:
-				traceback.print_exc()
+			except:
+				pass
 	
 	def tick(self):
 		self.draw()
