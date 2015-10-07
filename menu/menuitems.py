@@ -17,7 +17,7 @@ class MenuItem(object):
 	def load_preview(filename):
 		bmp = pygame.image.load(filename)
 		arr = pygame.PixelArray(bmp)
-		frame = [[int_to_color(arr[x, y]) for y in range(MenuItem.PREVIEW_SIZE)] for x in range(MenuItem.PREVIEW_SIZE)]
+		frame = [[int_to_rgb_color(arr[x, y]) for y in range(MenuItem.PREVIEW_SIZE)] for x in range(MenuItem.PREVIEW_SIZE)]
 
 		return frame
 

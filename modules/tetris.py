@@ -109,12 +109,11 @@ class Tetris(Module):
 		while self.fits(self.current_tetromino, Point(pos.x, pos.y + 1)):
 			pos = Point(pos.x, pos.y + 1)
 		
-		f = 0.03
-		color = Color(int(self.current_tetromino.color.r * f), int(self.current_tetromino.color.g * f), int(self.current_tetromino.color.b * f))
+		dark_color = darken_color(self.current_tetromino.color, 0.03)
 		for x in range(self.current_tetromino.width):
 			for y in range(self.current_tetromino.height):
 				if self.current_tetromino.map[x][y]:
-					self.screen.pixel[x + (self.screen.width - self.level_width) / 2 + pos.x][y + (self.screen.height - self.level_height) / 2 + pos.y] = color
+					self.screen.pixel[x + (self.screen.width - self.level_width) / 2 + pos.x][y + (self.screen.height - self.level_height) / 2 + pos.y] = dark_color
 	
 	def draw(self):
 		self.screen.clear()

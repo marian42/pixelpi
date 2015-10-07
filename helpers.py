@@ -6,7 +6,7 @@ def Color(r, g, b):
 
 RGBColor = collections.namedtuple('RGBColor', 'r g b')
 
-def int_to_color(c):
+def int_to_rgb_color(c):
 	b =  c & 255
 	g = (c >> 8) & 255
 	r = (c >> 16) & 255
@@ -20,3 +20,9 @@ def hsv_to_color(hue, saturation, value):
 
 def rgb_to_int(c):
 	return Color(c.r, c.g, c.b)
+
+def darken_color(color, factor):
+	b =  color & 255
+	g = (color >> 8) & 255
+	r = (color >> 16) & 255
+	return Color(int(r * factor), int(g * factor), int(b * factor))

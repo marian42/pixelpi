@@ -193,8 +193,7 @@ class Pacman(Module):
 		for i in range(self.lives):
 			self.screen.pixel[1 + 2 * i][15] = self.pacman_color
 
-		brightness = 0.2 + 0.8 * math.sin(time.clock() / self.step_interval / 2 * math.pi + 0.5 * math.pi)**2
-		self.screen.pixel[self.pacman.x][self.pacman.y] = Color(self.pacman_color.r * brightness, self.pacman_color.g * brightness, self.pacman_color.b * brightness)
+		self.screen.pixel[self.pacman.x][self.pacman.y] = darken_color(self.pacman_color, 0.2 + 0.8 * math.sin(time.clock() / self.step_interval / 2 * math.pi + 0.5 * math.pi)**2)
 
 		for ghost in self.ghosts:
 			ghost.draw()
