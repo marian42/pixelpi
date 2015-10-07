@@ -104,6 +104,7 @@ class Menu(object):
 			self.move(-1)
 		if key == 2:
 			self.launch()
+			return True
 
 		self.items[self.index].on_key_press(key, self)
 

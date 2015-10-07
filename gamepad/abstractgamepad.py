@@ -18,14 +18,18 @@ class AbstractGamepad(object):
 		if self.verbose:
 			print('Pressed ' + str(btn))
 		for callback in self.on_press:
-			callback(btn)
+			event_handled = callback(btn)
+			if event_handled:
+				return
 		
 	def release(self, btn):
 		self.button[btn] = False
 		if self.verbose:
 			print('Released ' + str(btn))
 		for callback in self.on_release:
-			callback(btn)
+			event_handled = callback(btn)
+			if event_handled:
+				return
 
 	def tick(self):
 		pass
