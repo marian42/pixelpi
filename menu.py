@@ -37,7 +37,7 @@ class Menu(object):
 				for source_y in range(8):
 					target = Point(source_x + x - 4, source_y + y - 4)
 					if target.x >= 0 and target.x < 16 and target.y >= 0 and target.y < 16:
-						self.screen.pixel[target.x][target.y] = graphic[source_x][source_y]
+						self.screen.pixel[target.x][target.y] = rgb_to_int(graphic[source_x][source_y])
 			return
 
 		for target_x in range(16):

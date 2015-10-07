@@ -85,7 +85,7 @@ class BrightnessItem(MenuItem):
 		self.preview = [self.preview_template[x][:] for x in range(8)]
 		for x in range(8):
 			if self.value > x:
-				self.preview[x][7] = Color(255, 255, 255)
+				self.preview[x][7] = RGBColor(255, 255, 255)
 
 	def is_launchable(self):
 		return False
