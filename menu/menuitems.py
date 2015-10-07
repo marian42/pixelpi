@@ -103,6 +103,14 @@ class BrightnessItem(MenuItem):
 			self.value = min(max(0, self.value - 1), 8)
 			self.update(menu)
 
+class MusicItem(MenuItem):
+	def __init__(self):
+		self.preview = MenuItem.load_preview('menu/preview/music.bmp')
+
+	def get_module(self, screen, gamepad):
+		from modules.music import Music
+		return Music(screen)
+
 menu_items = [
 	CycleItem(),
 	TetrisItem(),
@@ -110,5 +118,6 @@ menu_items = [
 	PacmanItem(),
 	ClockItem(),
 	PieItem(),
-	BrightnessItem()
+	BrightnessItem(),
+	MusicItem()
 ]
