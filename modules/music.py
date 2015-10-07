@@ -14,6 +14,7 @@ class Music(Module):
 		self.position = 0
 		start_new_thread(self.check_serial, ())
 		self.last_frame = time.time()
+		self.delta_t = 0
 		self.colors = [hsv_to_color(x / 16.0, 1, 1) for x in range(16)]
 		self.inertia = [0 for x in range(16)]
 
@@ -33,7 +34,7 @@ class Music(Module):
 		self.draw()
 
 		now = time.time()
-		#print(1 / (now - self.last_frame))
+		self.delta_t = now - self.last_frame
 		self.last_frame = now
 
 	def get_value(self, index):
@@ -54,6 +55,6 @@ class Music(Module):
 			self.inertia[x] = max(self.inertia[x], value)
 			if int(self.inertia[x]) < 16:
 				self.screen.pixel[x][15 - int(self.inertia[x])] = Color(255, 255, 255)
-			self.inertia[x] -= 0.5
+			self.inertia[x] -= self.delta_t * 15
 
 		self.screen.update()
