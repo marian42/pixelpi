@@ -187,16 +187,10 @@ class Tetris(Module):
 			for p in particles:
 				p.step(dt)
 
-			particles = [p for p in particles if p.y < self.level_height]
-
-			for p in particles:
-				if p.y >= self.level_height:
-					print('wtf')
-			
+			particles = [p for p in particles if p.y < self.level_height]	
 			
 			self.draw()
 			for p in particles:
-				#print(p.y)
 				self.screen.pixel[p.x + (self.screen.width - self.level_width) / 2][int(math.floor(p.y)) + (self.screen.height - self.level_height) / 2] = p.color
 
 			self.screen.update()
