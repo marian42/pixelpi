@@ -33,3 +33,6 @@ class AbstractGamepad(object):
 
 	def tick(self):
 		pass
+
+	def available(self):
+		return True

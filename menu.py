@@ -22,6 +22,9 @@ class Menu(object):
 		self.reset(redraw = False)
 		self.resume_animation()
 
+		if not self.gamepad.available():
+			self.launch()
+
 	def reset(self, redraw = True):
 		self.dir = 0
 		self.offset = 0

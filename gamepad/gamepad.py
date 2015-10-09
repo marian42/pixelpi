@@ -9,13 +9,21 @@ class Gamepad(AbstractGamepad):
 	def __init__(self, verbose = False):
 		super(Gamepad, self).__init__(verbose)
 
-		self.pipe = open('/dev/input/by-id/usb-Logitech_Logitech_Dual_Action-event-joystick', 'r')
+		self.pipe = None
+		try:
+			self.pipe = open('/dev/input/by-id/usb-Logitech_Logitech_Dual_Action-event-joystick', 'r')
+		except IOError:
+			print("No gamepad connected")
 		
 		self.start()
 
+	def available(self):
+		return self.pipe != None
+
 	def start(self):
 		self.running = True
-		start_new_thread(self.run, ())
+		if self.available():
+			start_new_thread(self.run, ())
 		
 	def stop(self):
 		self.running = False
