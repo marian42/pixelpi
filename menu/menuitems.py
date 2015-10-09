@@ -34,7 +34,7 @@ class CycleItem(MenuItem):
 
 	def get_module(self, screen, gamepad):
 		from modules.cycle import Cycle
-		return Cycle(screen, 'animations')
+		return Cycle(screen, gamepad, 'animations')
 
 class TetrisItem(MenuItem):
 	def __init__(self):
