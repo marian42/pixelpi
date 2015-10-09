@@ -1,20 +1,21 @@
 import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
-from menu.menuitems import menu_items
+from menu.menuitems import create_menu_items
 from screenfactory import create_screen
 from gamepadfactory import create_gamepad
 import pygame
 import time
 import math
 from helpers import *
+import config
 
 class Menu(object):
-	def __init__(self, items):
-		self.screen = create_screen()
+	def __init__(self, screen, items):
+		self.screen = screen
 		self.gamepad = create_gamepad()
 		self.gamepad.on_press.append(self.on_key_down)
 
-		self.index = 0
+		self.index = config.default_item_index
 		self.items = items
 		self.module = None
 
@@ -148,7 +149,7 @@ class Menu(object):
 		self.reset()
 
 if __name__ == '__main__':
-	menu = Menu(menu_items)
+	menu = Menu(create_screen(), create_menu_items())
 	while True:
 		menu.tick()
 		pygame.time.wait(10)

@@ -1,5 +1,6 @@
 import pygame.image
 from helpers import *
+import screen.screen
 
 class MenuItem(object):
 	PREVIEW_SIZE = 8
@@ -76,31 +77,30 @@ class PieItem(MenuItem):
 		return Pie(screen)
 
 class BrightnessItem(MenuItem):
-	def __init__(self):
+	def __init__(self, screen):
 		self.preview_template = MenuItem.load_preview('menu/preview/brightness.bmp')
-		self.value = 5
+		self.screen = screen
 		self.draw()
 
 	def draw(self):
 		self.preview = [self.preview_template[x][:] for x in range(8)]
 		for x in range(8):
-			if self.value > x:
+			if self.screen.get_brightness() > x:
 				self.preview[x][7] = RGBColor(255, 255, 255)
 
 	def is_launchable(self):
 		return False
 
 	def update(self, menu):
-		menu.screen.strip.setBrightness(int(4 + 3.1 * (self.value+1)**2))
 		self.draw()
 		menu.draw()
 
 	def on_key_press(self, key, menu):
 		if key == menu.gamepad.UP:
-			self.value = min(max(0, self.value + 1), 8)
+			self.screen.set_brightness(self.screen.get_brightness() + 1)
 			self.update(menu)
 		if key == menu.gamepad.DOWN:
-			self.value = min(max(0, self.value - 1), 8)
+			self.screen.set_brightness(self.screen.get_brightness() - 1)
 			self.update(menu)
 
 class MusicItem(MenuItem):
@@ -111,13 +111,18 @@ class MusicItem(MenuItem):
 		from modules.music import Music
 		return Music(screen)
 
-menu_items = [
-	CycleItem(),
-	TetrisItem(),
-	SnakeItem(),
-	PacmanItem(),
-	ClockItem(),
-	PieItem(),
-	BrightnessItem(),
-	MusicItem()
-]
+def create_menu_items():
+	menu_items = [
+		CycleItem(),
+		TetrisItem(),
+		SnakeItem(),
+		PacmanItem(),
+		ClockItem(),
+		PieItem(),
+		MusicItem()
+	]
+
+	if screen.screen.instance != None:
+		menu_items.append(BrightnessItem(screen.screen.instance))
+	
+	return menu_items
