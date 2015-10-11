@@ -29,14 +29,15 @@ class Ghost(object):
 		if self.mode == self.CHASE:
 			return time.clock() + 6
 		if self.mode == self.ROAM:
-			return time.clock() + 10
+			return time.clock() + 5
 		if self.mode == self.FLEE:
-			return time.clock() + 16
+			return time.clock() + 10
 		if self.mode == self.GOHOME:
 			return None
 
 	def set_mode(self, mode):
 		self.mode = mode
+		self.destination = None
 		self.next_mode = self.get_mode_end()
 
 	def get_next_mode(self):
@@ -51,12 +52,12 @@ class Ghost(object):
 
 	def get_interval(self):
 		if self.mode == self.CHASE:
-			return 0.3
+			return 0.2
 		if self.mode == self.FLEE:
-			return 0.4
+			return 0.6
 		if self.mode == self.ROAM:
 			return 0.3
-		return 0.3
+		return 0.4
 
 	def get_random_place(self):
 		p = Point(random.randint(0, 15), random.randint(0, 14))
@@ -71,9 +72,9 @@ class Ghost(object):
 		if self.mode == self.CHASE:
 			self.destination = self.game.pacman
 		if self.mode == self.GOHOME:
-			self.destination =  self.home
+			self.destination = self.home
 		if self.mode == self.FLEE:
-			self.destination =  self.game.pacman
+			self.destination = self.get_random_place()
 		if self.mode == self.ROAM:
 			self.destination = self.get_random_place()
 		return self.destination
@@ -91,8 +92,7 @@ class Ghost(object):
 		self.game.screen.pixel[self.pos.x][self.pos.y] = self.get_color()
 
 	def move(self):
-		x = self.game.get_distance_map(self.get_destination())
-		direction_map = self.game.get_direction_map(self.get_destination(), self.mode == self.FLEE)
+		direction_map = self.game.get_direction_map(self.get_destination())
 		direction = direction_map[self.pos.x][self.pos.y]
 		old = self.pos
 		if (direction != None):
@@ -142,10 +142,10 @@ class Pacman(Module):
 		Point(3, 13), Point(5, 13), Point(10, 13), Point(12, 13)
 	]
 
-	step_interval = 0.2
+	step_interval = 0.25
 	wall_color = Color(0, 0, 234)
-	food_color = Color(61, 44, 42)
-	pill_color = Color(255, 184, 174)
+	food_color = Color(31, 22, 21)
+	pill_color = Color(61, 44, 42)
 	pacman_color = Color(255, 255, 0)
 	cherry_color = Color(255, 0, 0)
 
@@ -153,6 +153,8 @@ class Pacman(Module):
 		super(Pacman, self).__init__(screen)
 		self.gamepad = gamepad
 		self.gamepad.on_press.append(self.on_key_down)
+		
+		self.direction_maps = {}
 
 		self.new_game()
 
@@ -170,10 +172,10 @@ class Pacman(Module):
 			self.food = self.food_spots[:]
 			self.pills = self.pill_spots[:]
 		self.ghosts = [
-			Ghost(self, Color(0, 255, 255), 2),
-			Ghost(self, Color(255, 0, 0), 4),
-			Ghost(self, Color(255, 184, 255), 6),
-			Ghost(self, Color(255, 184, 81), 8)
+			Ghost(self, Color(0, 255, 255), 1),
+			Ghost(self, Color(255, 0, 0), 2),
+			Ghost(self, Color(255, 184, 255), 3),
+			Ghost(self, Color(255, 184, 81), 4)
 		]
 
 	def draw_walls(self):
@@ -193,9 +195,7 @@ class Pacman(Module):
 			self.screen.pixel[food.x][food.y] = self.food_color
 
 		for i in range(self.lives):
-			self.screen.pixel[1 + 2 * i][15] = self.pacman_color
-
-		
+			self.screen.pixel[1 + 2 * i][15] = self.pacman_color		
 
 		self.screen.pixel[self.pacman.x][self.pacman.y] = darken_color(self.pacman_color, 0.2 + 0.8 * math.sin(time.clock() / self.step_interval / 2 * math.pi + 0.5 * math.pi)**2)
 		
@@ -248,8 +248,7 @@ class Pacman(Module):
 
 		while time.clock() < end:
 			self.draw(update = False)
-			brightness = (end - time.clock()) / (end - start)
-			self.screen.pixel[self.pacman.x][self.pacman.y] = Color(self.pacman_color.r * brightness, self.pacman_color.g * brightness, self.pacman_color.b * brightness)
+			self.screen.pixel[self.pacman.x][self.pacman.y] = darken_color(self.pacman_color, (end - time.clock()) / (end - start))
 			self.screen.update()
 
 		time.sleep(1)
@@ -275,12 +274,11 @@ class Pacman(Module):
 			ghost.tick()
 		self.check_ghosts()
 
-		self.draw()
-
 		if time.clock() > self.next_step:
 			self.next_step += self.step_interval
-			self.move() 
+			self.move()
 
+		self.draw()
 		time.sleep(0.005)
 		
 	def on_key_down(self, key):
@@ -293,38 +291,35 @@ class Pacman(Module):
 		if key == self.gamepad.RIGHT:
 			self.new_dir = Point(1, 0)
 
-	def get_distance_map(self, dest):
+	def create_direction_map(self, dest):
+		distance_map = [[float("inf") for y in range(16)] for x in range(16)]
+		directions_map = [[None for y in range(16)] for x in range(16)]
+		
 		directions = [Point(1, 0), Point(-1, 0), Point(0, 1), Point(0, -1)]
 
 		to_visit = [dest]
-		distance_map = [[float("inf") for y in range(16)] for x in range(16)]
+		visited = [[False for y in range(16)] for x in range(16)]
 		distance_map[dest.x][dest.y] = 0
 
 		while len(to_visit) > 0:
-			place = to_visit.pop()
+			place = to_visit.pop(0)
+
+			if visited[place.x][place.y]:
+				continue
+			visited[place.x][place.y] = True
 
 			for direction in directions:
-				next = Point((place.x + direction.x + 16) % 16, (place.y + direction.y + 16 % 16))
+				next = Point((place.x + direction.x + 16) % 16, (place.y + direction.y + 16) % 16)
 
-				if self.walls[next.y][next.x] == 0 and distance_map[next.x][next.y] > distance_map[place.x][place.y] + 1:
+				if self.walls[next.y][next.x] == 0 and distance_map[next.x][next.y] > distance_map[place.x][place.y] + 1 and not visited[next.x][next.y]:
 					distance_map[next.x][next.y] = distance_map[place.x][place.y] + 1
+					directions_map[next.x][next.y] = Point(-direction.x, -direction.y)
 					to_visit.append(next)
 
-		return distance_map
+		self.direction_maps[dest] = directions_map
 
-	def get_direction_map(self, dest, invert = False):
-		distance_map = self.get_distance_map(dest)
-		directions_map = [[None for y in range(16)] for x in range(16)]
-		directions = [Point(1, 0), Point(-1, 0), Point(0, 1), Point(0, -1)]
+	def get_direction_map(self, dest):
+		if not dest in self.direction_maps:
+			self.create_direction_map(dest)
 
-		for x in range(16):
-			for y in range(16):
-				best = 0 if invert else float("inf")
-				for direction in directions:
-					next = Point((x + direction.x + 16) % 16, (y + direction.y + 16) % 16)
-					if (distance_map[next.x][next.y] > best) if invert else (distance_map[next.x][next.y] < best):
-						if self.walls[next.y][next.x] != 1:
-							directions_map[x][y] = direction
-							best = distance_map[next.x][next.y]
-
-		return directions_map
+		return self.direction_maps[dest]
