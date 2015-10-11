@@ -1,4 +1,3 @@
-from neopixel import *
 import pygame
 import helpers
 import config
@@ -7,10 +6,12 @@ instance = None
 
 class Screen:
 	def __init__(self, width = 16, height = 16, led_pin = 18, led_freq_hz = 800000, led_dma = 5, led_invert = False, led_brightness = 200):
+		import neopixel
+		
 		self.width = width
 		self.height = height
 		
-		self.strip = Adafruit_NeoPixel(width * height, led_pin, led_freq_hz, led_dma, led_invert, led_brightness)
+		self.strip = neopixel.Adafruit_NeoPixel(width * height, led_pin, led_freq_hz, led_dma, led_invert, led_brightness)
 		self.strip.begin()
 		self.update_brightness()
 		
