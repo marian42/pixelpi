@@ -159,15 +159,16 @@ class Pacman(Module):
 	def new_game(self):
 		self.lives = 3
 
-		self.new_level()
+		self.new_level(reset_food = True)
 
-	def new_level(self):
+	def new_level(self, reset_food):
 		self.pacman = Point(8, 9)
 		self.dir = Point(-1, 0)
 		self.new_dir = self.dir
-		self.next_step = time.clock() + self.step_interval
-		self.food = self.food_spots[:]
-		self.pills = self.pill_spots[:]
+		self.next_step = time.clock() + self.step_interval + 0.8
+		if reset_food:
+			self.food = self.food_spots[:]
+			self.pills = self.pill_spots[:]
 		self.ghosts = [
 			Ghost(self, Color(0, 255, 255), 2),
 			Ghost(self, Color(255, 0, 0), 4),
@@ -227,7 +228,13 @@ class Pacman(Module):
 					ghost.set_mode(ghost.FLEE)
 
 		if len(self.food) == 0 and len(self.pills) == 0:
-			self.new_level()
+			self.level_complete()
+
+	def level_complete(self):
+		animation = Animation(self.screen, "pacman/interlevel", interval = 40, autoplay = False)
+		animation.play_once()
+
+		self.new_level(reset_food = True)
 
 	def die(self):
 		self.draw(update = False)
@@ -250,10 +257,8 @@ class Pacman(Module):
 		time.sleep(0.5)
 		
 		self.lives -= 1
-		self.new_level()
+		self.new_level(reset_food = False)
 		self.draw()
-		self.next_step += 0.5
-		time.sleep(0.5)
 		
 
 	def check_ghosts(self):
