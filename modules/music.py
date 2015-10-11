@@ -57,3 +57,6 @@ class Music(Module):
 			self.inertia[x] -= self.delta_t * 15
 
 		self.screen.update()
+
+	def on_stop(self):
+		self.serial.close()
