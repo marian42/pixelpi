@@ -52,9 +52,9 @@ class Animation(Module):
 			except Exception:
 				print('Error loading ' + str(i) + '.bmp from ' + self.folder)
 				raise
-			arr = pygame.PixelArray(bmp)
+			pixel_array = pygame.PixelArray(bmp)
 			
-			frame = [[int_to_color(arr[x, y]) for y in range(16)] for x in range(16)]
+			frame = [[pixel_array[x, y] for y in range(16)] for x in range(16)]
 			self.frames.append(frame)
 			
 			i += 1
@@ -66,10 +66,10 @@ class Animation(Module):
 		self.frames = []
 		bmp = pygame.image.load(self.folder + '0.bmp')
 		framecount = bmp.get_height() / 16
-		arr = pygame.PixelArray(bmp)
+		pixel_array = pygame.PixelArray(bmp)
 			
 		for index in range(framecount):
-			frame = [[int_to_color(arr[x, y + 16 * index]) for y in range(16)] for x in range(16)]
+			frame = [[pixel_array[x, y + 16 * index] for y in range(16)] for x in range(16)]
 			self.frames.append(frame)
 	
 	def load_interval(self):

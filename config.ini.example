@@ -1,0 +1,7 @@
+[hardware]
+virtualhardware = false
+brightness = 5
+
+[menu]
+defaultitemindex = 0
+

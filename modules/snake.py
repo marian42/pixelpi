@@ -39,7 +39,7 @@ class Snake(Module):
 		start = time.clock()
 		while time.clock() < start + t:
 			self.screen.clear()
-			self.screen.pixel[self.snake[0].x][self.snake[0].y] = Color(int(self.head_color.r * (time.clock() - start)**2 / t), int(self.head_color.g * (time.clock() - start)**2 / t), int(self.head_color.b * (time.clock() - start)**2 / t))
+			self.screen.pixel[self.snake[0].x][self.snake[0].y] = darken_color(self.head_color, (time.clock() - start)**2 / t)
 			self.screen.update()
 		
 		self.next_step = time.clock() + self.interval
@@ -63,7 +63,7 @@ class Snake(Module):
 			if not self.running:
 				return
 			self.screen.clear()
-			self.screen.pixel[self.snake[0].x][self.snake[0].y] = Color(int(self.head_color.r * (1 - (time.clock() - start) / t)**2), int(self.head_color.g * (1 - (time.clock() - start) / t)**2), int(self.head_color.b * (1 - (time.clock() - start) / t)**2))
+			self.screen.pixel[self.snake[0].x][self.snake[0].y] = darken_color(self.head_color, (1 - (time.clock() - start) / t)**2)
 			self.screen.update()
 	
 		self.new_game()
@@ -101,20 +101,14 @@ class Snake(Module):
 					for y in range(self.screen.height):
 						d = ((x - self.last_food.x)** 2 + (y - self.last_food.y)**2) ** 0.5
 						if (d / radius)**0.5 < (time.clock() - self.pulse_offset) / t:
-							self.screen.pixel[x][y] = Color(
-								max(0, int(self.food_color.r * 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)),
-								max(0, int(self.food_color.g * 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)),
-								max(0, int(self.food_color.b * 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)))
+							self.screen.pixel[x][y] = darken_color(self.food_color, 0.2 * (1 - (time.clock() - self.pulse_offset) / t)**2)
 		
 		for p in self.snake:
 			self.screen.pixel[p.x][p.y] = Color(255, 255, 255)
 		self.screen.pixel[self.snake[0].x][self.snake[0].y] = self.head_color
 		
 		if self.food != None:
-			self.screen.pixel[self.food.x][self.food.y] = Color(
-				int(self.food_color.r * math.sin((time.clock() - self.pulse_offset) * 8) ** 2),
-				int(self.food_color.g * math.sin((time.clock() - self.pulse_offset) * 8) ** 2),
-				int(self.food_color.b * math.sin((time.clock() - self.pulse_offset) * 8) ** 2))
+			self.screen.pixel[self.food.x][self.food.y] = darken_color(self.food_color, math.sin((time.clock() - self.pulse_offset) * 8) ** 2)
 		
 		self.screen.update()
 		
