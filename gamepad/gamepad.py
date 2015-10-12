@@ -44,46 +44,8 @@ class Gamepad(AbstractGamepad):
 				# 8 bits make a byte
 				if len(byte) == 8:
 
-					# Button 1
-					if byte[2] == '20':
+					if byte[2] in ['20', '21', '22', '23', '24', '25', '26', '27', '28', '29']:
 						self.check(byte, byte[2])
-
-					# Button 2
-					if byte[2] == '21':
-						self.check(byte, byte[2])
-						
-					# Button 3
-					if byte[2] == '22':
-						self.check(byte, byte[2])
-						
-					# Button 4
-					if byte[2] == '23':
-						self.check(byte, byte[2])
-
-					# Button 5
-					if byte[2] == '24':
-						self.check(byte, byte[2])
-
-					# Button 6
-					if byte[2] == '25':
-						self.check(byte, byte[2])
-
-					# Button 7
-					if byte[2] == '26':
-						self.check(byte, byte[2])
-
-					# Button 8
-					if byte[2] == '27':
-						self.check(byte, byte[2])
-
-					# Button 9
-					if byte[2] == '28':
-						self.check(byte, byte[2])
-
-					# Button 9
-					if byte[2] == '29':
-						self.check(byte, byte[2])
-
 
 					if byte[0] == '03':
 						# Arrow Up
