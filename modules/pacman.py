@@ -257,8 +257,17 @@ class Pacman(Module):
 		time.sleep(0.5)
 		
 		self.lives -= 1
-		self.new_level(reset_food = False)
-		self.draw()
+		if self.lives >= 0:
+			self.new_level(reset_food = False)
+			self.draw()
+		else:
+			self.game_over()
+
+	def game_over(self):
+		animation = Animation(self.screen, "pacman/gameover", interval = 100, autoplay = False)
+		animation.play_once()
+		time.sleep(2.0)
+		self.new_game()
 		
 
 	def check_ghosts(self):

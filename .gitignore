@@ -1,4 +1,4 @@
 animations/
 other/
 *.pyc
-config.ini
+/config.ini
