@@ -8,7 +8,9 @@ class Cycle(Module):
 		super(Cycle, self).__init__(screen)
 
 		self.gamepad = gamepad
-		self.gamepad.on_press.append(self.key_press)
+		if gamepad is not None:
+			self.gamepad.on_press.append(self.key_press)
+		self.paused = False
 		
 		self.subfolders = self.load_subfolders(location)
 
@@ -18,6 +20,7 @@ class Cycle(Module):
 
 		self.history = []
 		self.history_position = -1
+		self.next_animation = time.time()
 
 	def load_subfolders(self, location):
 		if location[:1] != '/':
@@ -63,8 +66,10 @@ class Cycle(Module):
 		self.get_current_animation().start()
 		
 	def tick(self):
-		self.next(pick_random = True)
-		time.sleep(self.interval)
+		if not self.paused and time.time() > self.next_animation:
+			self.next(pick_random = True)
+			self.next_animation += self.interval
+		time.sleep(0.1)
 
 	def on_stop(self):
 		if self.get_current_animation() != None:
@@ -78,3 +83,11 @@ class Cycle(Module):
 				self.get_current_animation().stop()
 				self.history_position -= 1
 				self.get_current_animation().start()
+		if key == 2:
+			self.paused = not self.paused
+			if not self.paused:
+				self.next_animation = time.time() + self.interval
+			self.get_current_animation().stop()
+			icon = Animation(self.screen, "icons/pause" if self.paused else "icons/play", interval = 800, autoplay = False)
+			icon.play_once()			
+			self.get_current_animation().start()
