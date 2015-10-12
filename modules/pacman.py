@@ -178,6 +178,9 @@ class Pacman(Module):
 			Ghost(self, Color(255, 184, 81), 4)
 		]
 
+		self.draw(update = False)
+		self.screen.fade_in(0.8)
+
 	def draw_walls(self):
 		for x in range(16):
 			for y in range(16):
@@ -251,7 +254,10 @@ class Pacman(Module):
 			self.screen.pixel[self.pacman.x][self.pacman.y] = darken_color(self.pacman_color, (end - time.clock()) / (end - start))
 			self.screen.update()
 
-		time.sleep(1)
+		
+		self.screen.fade_out(0.8)
+		time.sleep(0.5)
+
 		animation = Animation(self.screen, "pacman/die", interval = 100, autoplay = False)
 		animation.play_once()
 		time.sleep(0.5)

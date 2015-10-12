@@ -114,7 +114,7 @@ class Menu(object):
 
 	def stop(self):
 		self.module.stop()
-		pygame.time.wait(200)
+		self.screen.fade_out(0.3)
 		self.module = None
 		self.resume_animation()
 		self.gamepad.on_press = [self.on_key_down]
