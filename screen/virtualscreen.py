@@ -1,26 +1,16 @@
 import pygame
 import collections
-
-Color = collections.namedtuple('Color', 'r g b')
+from abstractscreen import AbstractScreen
 
 # Behaves like the actual LED screen, but shows the screen content on a computer screen
-class VirtualScreen:
-	def __init__(self, width = 16, height = 16, led_pin = 18, led_freq_hz = 800000, led_dma = 5, led_invert = False, led_brightness = 200):
-		self.width = width
-		self.height = height
-
+class VirtualScreen(AbstractScreen):
+	def __init__(self, width = 16, height = 16, led_pin = 18, led_freq_hz = 800000, led_dma = 5, led_invert = False, led_brightness = 200):		
+		super(VirtualScreen, self).__init__(width, height)
 		self.pixel_size = 30
 		
-		self.pixel = [[(0,0,0) for y in range(height)] for x in range(width)]
-
 		pygame.display.init()
 		self.screen = pygame.display.set_mode([width * self.pixel_size, height * self.pixel_size], 0)
-		self.surface = pygame.Surface(self.screen.get_size())
-		
-	def clear(self, color = (0,0,0)):
-		for x in range(self.width):
-			for y in range(self.height):
-				self.pixel[x][y] = color
+		self.surface = pygame.Surface(self.screen.get_size())	
 				
 	def update(self):
 		for y in range(self.height):
