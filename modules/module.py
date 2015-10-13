@@ -2,7 +2,7 @@ from thread import start_new_thread
 from helpers import *
 
 class Module(object):
-	def __init__(self, screen, autoplay = True):
+	def __init__(self, screen):
 		self.screen = screen
 		self.running = False
 

@@ -36,3 +36,6 @@ class AbstractGamepad(object):
 
 	def available(self):
 		return True
+
+	def consume_event(self, event):
+		pass

@@ -33,13 +33,16 @@ class VirtualGamepad(AbstractGamepad):
 		for relation in self.keycode_list:
 			if (relation[0] == keycode):
 				return relation[1]
-
 			
 	def tick(self):
+		print("tick!")
 		for event in pygame.event.get():
-			if event.type == pygame.KEYDOWN:
-				self.press(self.keycode_to_int(event.key))
-			if event.type == pygame.KEYUP:
-				self.release(self.keycode_to_int(event.key))
+			self.consume_event(event)
+
+	def consume_event(self, event):
+		if event.type == pygame.KEYDOWN:
+			self.press(self.keycode_to_int(event.key))
+		if event.type == pygame.KEYUP:
+			self.release(self.keycode_to_int(event.key))
 
 instance = VirtualGamepad()
