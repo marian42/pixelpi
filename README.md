@@ -6,9 +6,7 @@ Games and Animations on 16x16 LEDs
 This is a collection of python scripts that run animations and games on a 16x16 matrix of WS2812B LEDs (aka Neopixel).
 The project is inspired by and compatible to Jeremy Williams' [Game Frame](http://ledseq.com).
 
-## Setup
-
-### Hardware
+## Hardware
 
 Here is a [set of photos](https://imgur.com/a/Ql25S) of the hardware I use and a parts list with approximate costs:
 - 300 LEDs, WS2812B, 60/m 38 €
@@ -49,22 +47,23 @@ The `Screen.py` script expects your LED strip to be layed out like this:
 
 If you have a different setup, you can edit the `Screen.py` file to translate the 16x16 matrix on your LED strip.
 
-## Animations
+## Software
 
-The `Animation.py` script can run all animations that work with the Game Frame.
+To set up the software, clone this repository on your Raspberry Pi. Rename the file `config.ini.example` to `config.ini`.
+Make sure, the neopixel library is installed.
+
+### Animations
+Place your animations in a folder called `animations` in the repository. For each animation, a file `/animations/animation_name/0.bmp` should exist.
+
 Here are the [Eboy animations](http://ledseq.com/product/game-frame-sd-files/) and a [forum for fan-made Game Frame animations](http://ledseq.com/forums/forum/game-frame/game-frame-art/).
 
-Each animation should have it's own folder. If you have all animations in the folder `myfolder`, you can run
-```
-sudo python Animation.py myfolder/animation1
-```
+Take a look at the files `example_animation.py` and `example_cycle.py` to display single or multiple animations.
 
-To cycle through multiple animations, run
-```
-sudo python Cycle.py myfolder
-```
-
-It's a good idea to run this command at the boot of the Pi, in this case you need absolute paths for the python file and animations folder.
-
-## Gamepad
+### Gamepad
 The current gamepad code probably only works with my logitech gamepad. I'm planning to make more generic gamepad support. Until then, you need to edit the `gamepad.py` file and make it work with your gamepad.
+
+### Menu
+The file `menu.py` provides a visual menu to select from the available modules such as animations and games. For me, this is the default way of using the LED screen. You need a gamepad for this to work.
+
+### Virtual hardware
+You can test all software without a Raspberry Pi, Gamepad or LED matrix. To do so, set up the software as described above and edit the `config.ini` file. Set `virtualhardware` to true. Try to run `menu.py`, a window with a simulated screen should open. Note that this requires `pygame` which you may need to install.
