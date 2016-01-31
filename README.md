@@ -51,6 +51,7 @@ If you have a different setup, you can edit the `Screen.py` file to translate th
 
 To set up the software, clone this repository on your Raspberry Pi. Rename the file `config.ini.example` to `config.ini`.
 Make sure, the neopixel library is installed.
+This project uses Python 2.7.
 
 ### Animations
 Place your animations in a folder called `animations` in the repository. For each animation, a file `/animations/animation_name/0.bmp` should exist.
