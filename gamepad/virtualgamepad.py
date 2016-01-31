@@ -34,7 +34,7 @@ class VirtualGamepad(AbstractGamepad):
 			if (relation[0] == keycode):
 				return relation[1]
 			
-	def tick(self)
+	def tick(self):
 		for event in pygame.event.get():
 			self.consume_event(event)
 
