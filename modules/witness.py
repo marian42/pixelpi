@@ -63,6 +63,7 @@ class Path:
 			self.screen.update()
 
 		self.offset_end = time.clock()
+		self.offset_start = self.offset_end - 1
 
 		
 	def move(self, direction):
