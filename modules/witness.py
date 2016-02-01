@@ -48,7 +48,7 @@ class Path:
 		self.screen = screen
 		self.steps = [puzzle.entry]
 
-		self.offset_time = 0.25
+		self.offset_time = 0.2
 		self.offset_start = time.clock()
 		self.offset_end = self.offset_start + self.offset_time
 
@@ -57,7 +57,10 @@ class Path:
 		self.offset_start = self.offset_end + self.offset_time
 
 		while time.clock() < self.offset_start:
-			time.sleep(0.1)
+			time.sleep(0.01)
+			self.puzzle.draw(self.screen)
+			self.draw()
+			self.screen.update()
 
 		self.offset_end = time.clock()
 
@@ -86,7 +89,6 @@ class Path:
 
 	def draw(self):
 		offset = 1.0 - min(1, max(0, (time.clock() - self.offset_start) / (self.offset_end - self.offset_start)))
-		print offset
 		
 		for i in range(len(self.steps) - 1):
 			for p in range(self.puzzle.cell_size):
@@ -124,6 +126,8 @@ class WitnessGame(Module):
 		self.path = Path(self.puzzle, screen)		
 		
 		self.gamepad.on_press.append(self.on_key_down)
+
+		self.key_queue = []
 	
 	def draw(self):
 		self.puzzle.draw(self.screen)
@@ -131,10 +135,16 @@ class WitnessGame(Module):
 		self.screen.update()
 		
 	def tick(self):
+		if (len(self.key_queue) != 0):
+			self.handle_key(self.key_queue.pop(0))
+
 		self.draw()
 		time.sleep(0.01)
-		
+
 	def on_key_down(self, key):
+		self.key_queue.append(key)
+
+	def handle_key(self, key):		
 		if key == self.gamepad.UP:
 			self.path.move(Point(0, -1))
 		if key == self.gamepad.DOWN:
