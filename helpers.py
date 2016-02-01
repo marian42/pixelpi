@@ -21,8 +21,14 @@ def hsv_to_color(hue, saturation, value):
 def rgb_to_int(c):
 	return Color(c.r, c.g, c.b)
 
-def darken_color(color, factor):
+def darken_color(color, factor): # 0 is darkest, 1 is no change
 	b =  color & 255
 	g = (color >> 8) & 255
 	r = (color >> 16) & 255
 	return Color(int(r * factor), int(g * factor), int(b * factor))
+
+def brighten_color(color, factor): # 0 is brightest, 1 is no change
+	b =  color & 255
+	g = (color >> 8) & 255
+	r = (color >> 16) & 255
+	return Color(int(255 - (255 - r) * factor), int(255 - (255 - g) * factor), int(255 - (255 - b) * factor))

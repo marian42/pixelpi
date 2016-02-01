@@ -111,6 +111,15 @@ class MusicItem(MenuItem):
 		from modules.music import Music
 		return Music(screen)
 
+class WitnessItem(MenuItem):
+	def __init__(self):
+		self.preview = MenuItem.load_preview('menu/preview/witness.bmp')
+
+	def get_module(self, screen, gamepad):
+		from modules.witness import WitnessGame
+		return WitnessGame(screen, gamepad)
+
+
 def create_menu_items():
 	menu_items = [
 		CycleItem(),
@@ -119,7 +128,8 @@ def create_menu_items():
 		PacmanItem(),
 		ClockItem(),
 		PieItem(),
-		MusicItem()
+		MusicItem(),
+		WitnessItem()
 	]
 
 	if screen.screen.instance != None:
