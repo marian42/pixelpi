@@ -32,3 +32,16 @@ def brighten_color(color, factor): # 0 is brightest, 1 is no change
 	g = (color >> 8) & 255
 	r = (color >> 16) & 255
 	return Color(int(255 - (255 - r) * factor), int(255 - (255 - g) * factor), int(255 - (255 - b) * factor))
+
+def blend_colors(color1, color2, progress):
+	b1 =  color1 & 255
+	g1 = (color1 >> 8) & 255
+	r1 = (color1 >> 16) & 255
+
+	b2 =  color2 & 255
+	g2 = (color2 >> 8) & 255
+	r2 = (color2 >> 16) & 255
+
+	inverted_progress = 1.0 - progress
+	return Color(int(inverted_progress * r1 + progress * r2), int(inverted_progress * g1 + progress * g2), int(inverted_progress * b1 + progress * b2))
+	
