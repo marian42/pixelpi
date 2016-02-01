@@ -18,9 +18,9 @@ class Puzzle:
 		self.offset = Point(2 if self.entry.x == 0 else 1, 2 if self.entry.y == 0 else 1)
 		self.exit_on_screen = Point(self.offset.x + self.exit.x * self.cell_size, self.offset.y + self.exit.y * self.cell_size + (-1 if self.exit.y == 0 else 1))
 
-		self.background_color = Color(235, 174, 10)
-		self.line_color = darken_color(self.background_color, 0.5)
-		self.path_color = brighten_color(self.background_color, 0.5)
+		self.background_color = hsv_to_color(random.random(), 1, 1)
+		self.line_color = darken_color(self.background_color, 0.4)
+		self.path_color = brighten_color(self.background_color, 0.4)
 
 	def draw(self, screen):
 		screen.clear(self.background_color)
