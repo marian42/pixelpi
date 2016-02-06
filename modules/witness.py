@@ -51,6 +51,35 @@ class MandatoryEdge(AbstractPuzzleFeature):
 		position = Point(self.puzzle.offset.x + self.node1.x * self.puzzle.cell_size + (self.node2.x - self.node1.x), self.puzzle.offset.y + self.node1.y * self.puzzle.cell_size + (self.node2.y - self.node1.y))
 		screen.pixel[position.x][position.y] = darken_color(self.puzzle.line_color, 0.1)
 
+class ColorBlocks(AbstractPuzzleFeature):
+	def __init__(self, puzzle):
+		self.puzzle = puzzle
+		self.colors = [[None for y in range(puzzle.height - 1)] for x in range(puzzle.width -1)]
+
+	def check(self, path):
+		zones = path.get_zones()
+
+		zone_color_dict = {}
+
+		for x in range(self.puzzle.width - 1):
+			for y in range(self.puzzle.height - 1):
+				if self.colors[x][y] != None:
+					if zones[x][y] in zone_color_dict:
+						if zone_color_dict[zones[x][y]] != self.colors[x][y]:
+							return False
+					else:
+						zone_color_dict[zones[x][y]] = self.colors[x][y]
+		return True
+
+	def draw(self, screen):
+		for x in range(self.puzzle.width - 1):
+			for y in range(self.puzzle.height - 1):
+				if self.colors[x][y] != None:
+					for a in range(self.puzzle.cell_size - 1):
+						for b in range(self.puzzle.cell_size - 1):
+							position = Point(self.puzzle.offset.x + x * self.puzzle.cell_size + 1 + a, self.puzzle.offset.y + y * self.puzzle.cell_size + 1 + b)
+							screen.pixel[position.x][position.y] = self.colors[x][y]
+
 class Puzzle:
 	def __init__(self, screen):
 		self.screen = screen
@@ -115,6 +144,25 @@ class Puzzle:
 				mandatory_edge = random.choice(available_mandatory_edges)
 				available_mandatory_edges.remove(mandatory_edge)
 				self.features.append(MandatoryEdge(self, mandatory_edge[0], mandatory_edge[1]))
+
+		zones = self.solution.get_zones()
+		if self.solution.zone_count > 1:
+			found_white = False
+			found_black = False
+
+			colorblocks = ColorBlocks(self)
+			for i in range(random.randint(4, 10)):
+				p = Point(random.randint(0, self.width - 2), random.randint(0, self.height - 2))
+
+				if zones[p.x][p.y] % 2 == 0:
+					found_black = True
+				else:
+					found_white = True
+
+				colorblocks.colors[p.x][p.y] = Color(0, 0, 0) if zones[p.x][p.y] % 2 == 0 else Color(255, 255, 255)
+			
+			if found_white and found_black:
+				self.features.append(colorblocks)
 
 	def draw(self, screen):
 		screen.clear(self.background_color)
@@ -309,6 +357,40 @@ class Path:
 			if not feature.check(self):
 				return False
 		return True
+
+	def fill_zone(self, x, y, value):
+		queue = [Point(x, y)]
+		self.zones[x][y] = value
+
+		while len(queue) != 0:
+			block = queue.pop(0)
+
+			if block.x > 0 and self.zones[block.x - 1][block.y] == -1 and not self.contains_edge(block, Point(block.x, block.y + 1)):
+				self.zones[block.x - 1][block.y] = value
+				queue.append(Point(block.x - 1, block.y))
+			if block.y > 0 and self.zones[block.x][block.y - 1] == -1 and not self.contains_edge(block, Point(block.x + 1, block.y)):
+				self.zones[block.x][block.y - 1] = value
+				queue.append(Point(block.x, block.y - 1))
+			if block.x < self.puzzle.width - 2 and self.zones[block.x + 1][block.y] == -1 and not self.contains_edge(Point(block.x + 1, block.y), Point(block.x + 1, block.y + 1)):
+				self.zones[block.x + 1][block.y] = value
+				queue.append(Point(block.x + 1, block.y))
+			if block.y < self.puzzle.height - 2 and self.zones[block.x][block.y + 1] == -1 and not self.contains_edge(Point(block.x, block.y  + 1), Point(block.x + 1, block.y + 1)):
+				self.zones[block.x][block.y + 1] = value
+				queue.append(Point(block.x, block.y + 1))
+
+	def get_zones(self):
+		self.zones = [[-1 for y in range(self.puzzle.height - 1)] for x in range(self.puzzle.width -1)]
+		
+		zone_index = 0
+
+		for x in range(self.puzzle.width - 1):
+			for y in range(self.puzzle.height - 1):
+				if self.zones[x][y] == -1:
+					self.fill_zone(x, y, zone_index)
+					zone_index += 1
+
+		self.zone_count = zone_index
+		return self.zones
 
 class WitnessGame(Module):
 	def __init__(self, screen, gamepad):
