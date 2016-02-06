@@ -38,6 +38,19 @@ class ForbiddenEdge(AbstractPuzzleFeature):
 			position = Point(self.puzzle.offset.x + self.node1.x * self.puzzle.cell_size + (self.node2.x - self.node1.x) * p, self.puzzle.offset.y + self.node1.y * self.puzzle.cell_size + (self.node2.y - self.node1.y) * p)
 			screen.pixel[position.x][position.y] = self.puzzle.background_color
 
+class MandatoryEdge(AbstractPuzzleFeature):
+	def __init__(self, puzzle, node1, node2):
+		self.puzzle = puzzle
+		self.node1 = node1
+		self.node2 = node2
+
+	def check(self, path):
+		return path.contains_edge(self.node1, self.node2)
+
+	def draw(self, screen):
+		position = Point(self.puzzle.offset.x + self.node1.x * self.puzzle.cell_size + (self.node2.x - self.node1.x), self.puzzle.offset.y + self.node1.y * self.puzzle.cell_size + (self.node2.y - self.node1.y))
+		screen.pixel[position.x][position.y] = darken_color(self.puzzle.line_color, 0.1)
+
 class Puzzle:
 	def __init__(self, screen):
 		self.screen = screen
@@ -72,8 +85,10 @@ class Puzzle:
 		available_mandatory_nodes.remove(self.entry)
 		available_mandatory_nodes.remove(self.exit)
 
+		available_mandatory_edges = [(self.solution.steps[i], self.solution.steps[i + 1]) for i in range(1, len(self.solution.steps) - 1)]
+
 		for i in range(total_features):
-			feature_type = random.randint(0, 1)
+			feature_type = random.randint(0, 2)
 
 			if feature_type == 0 and len(available_mandatory_nodes) > 0:
 				mandatory_node = random.choice(available_mandatory_nodes)
@@ -96,7 +111,10 @@ class Puzzle:
 
 				self.features.append(ForbiddenEdge(self, node1, node2))
 
-
+			if feature_type == 2 and len(available_mandatory_edges) > 1:
+				mandatory_edge = random.choice(available_mandatory_edges)
+				available_mandatory_edges.remove(mandatory_edge)
+				self.features.append(MandatoryEdge(self, mandatory_edge[0], mandatory_edge[1]))
 
 	def draw(self, screen):
 		screen.clear(self.background_color)
@@ -336,6 +354,8 @@ class WitnessGame(Module):
 
 				self.path.offset_start = time.clock()
 				self.path.offset_end = self.path.offset_start + self.path.offset_time
+		if key == 3:
+			self.path = Path(self.puzzle, self.screen)
 
 	def new_game(self):
 		self.puzzle = Puzzle(self.screen)
