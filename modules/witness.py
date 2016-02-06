@@ -42,6 +42,27 @@ class Puzzle:
 
 		screen.pixel[self.exit_on_screen.x][self.exit_on_screen.y] = self.line_color
 
+	def create_random_path(self, screen):
+		# Start by making a simple path
+
+		dx = self.exit.x - self.entry.x
+		dy = self.exit.y - self.entry.y
+
+		steps = [Point(dx / abs(dx), 0) for i in range(abs(dx))]
+		steps += [Point(0, dy / abs(dy)) for i in range(abs(dy))]
+		random.shuffle(steps)
+
+		path = Path(self, screen)
+		for step in steps:
+			path.steps.append(Point(path.steps[len(path.steps) - 1].x + step.x, path.steps[len(path.steps) - 1].y + step.y))
+
+		# Randomly extend the path
+		for i in range(random.randint(0, 9)):
+			path.extend()
+
+		return path
+		
+
 class Path:
 	def __init__(self, puzzle, screen):
 		self.puzzle = puzzle
@@ -116,7 +137,70 @@ class Path:
 
 					self.screen.pixel[self.puzzle.offset.x + x + self.steps[0].x * self.puzzle.cell_size - 1][self.puzzle.offset.y + y + self.steps[0].y * self.puzzle.cell_size - 1] = color
 
+	def contains_node(self, point):
+		for step in self.steps:
+			if step == point:
+				return True
+		return False
 
+	def contains_edge(self, point1, point2):
+		for i in range(len(self.steps) - 1):
+			if (self.steps[i] == point1 and self.steps[i + 1] == point2) or (self.steps[i] == point2 and self.steps[i + 1] == point1):
+				return True
+		return False
+
+	# Makes a random change to the path that either keeps the length or extends it
+	def extend(self):
+		blocks = []
+
+		# Find all blocks that can be used to extend the path
+		# Block must contain an existing edge and two empty nodes
+		for x in range(self.puzzle.height - 1):
+			for y in range(self.puzzle.width - 1):
+				nodes = [Point(x, y), Point(x + 1, y), Point(x + 1, y + 1), Point(x, y + 1)]
+
+				nodes_in_path = 0
+				for node in nodes:
+					if self.contains_node(node):
+						nodes_in_path += 1
+
+				if nodes_in_path != 2:
+					continue
+
+				contains_edge = False
+				for i in range(4):
+					if self.contains_edge(nodes[i], nodes[(i + 1) % 4]):
+						contains_edge = True
+
+				if contains_edge:
+					blocks.append(Point(x, y))
+
+		if len(blocks) == 0:
+			return
+
+		# Chose a block in which to extend the path
+		block = random.choice(blocks)
+
+		nodes = [Point(block.x, block.y), Point(block.x + 1, block.y), Point(block.x + 1, block.y + 1), Point(block.x, block.y + 1)]
+
+		#Extend
+		to_add = []
+
+		for node in nodes:
+			if not self.contains_node(node):
+				to_add.append(node)
+
+		entry = None
+
+		for node in self.steps:
+			if entry == None and node in nodes:
+				entry = node
+
+		if entry.x != to_add[0].x and entry.y != to_add[0].y:
+			to_add = to_add[::-1]
+
+		self.steps.insert(self.steps.index(entry) + 1, to_add[0])
+		self.steps.insert(self.steps.index(entry) + 2, to_add[1])
 
 class WitnessGame(Module):
 	def __init__(self, screen, gamepad):
@@ -154,3 +238,5 @@ class WitnessGame(Module):
 			self.path.move(Point(-1, 0))
 		if key == self.gamepad.RIGHT:
 			self.path.move(Point(1, 0))
+		if key == 2:
+			self.path = self.puzzle.create_random_path(self.screen)
