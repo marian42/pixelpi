@@ -46,14 +46,18 @@ class Puzzle:
 		self.height = 5
 		self.cell_size = 3
 		
-		self.entry = Point(0, 4)
-		self.exit = Point(4, 0)
+		self.entry = Point(random.choice([0, self.width - 1]), random.choice([0, self.height - 1]))
+
+		while True:			
+			self.exit = Point(random.choice([0, self.width - 1]), random.choice([0, self.height - 1]))
+			if self.exit != self.entry:
+				break
 		
 		self.offset = Point(2 if self.entry.x == 0 else 1, 2 if self.entry.y == 0 else 1)
 		self.exit_on_screen = Point(self.offset.x + self.exit.x * self.cell_size, self.offset.y + self.exit.y * self.cell_size + (-1 if self.exit.y == 0 else 1))
 
 		self.background_color = hsv_to_color(random.random(), 1, 0.4)
-		self.line_color = darken_color(self.background_color, 0.4)
+		self.line_color = darken_color(self.background_color, 0.3)
 		self.path_color = brighten_color(self.background_color, 0.4)
 
 		self.solution = self.create_random_path(self.screen)
@@ -188,7 +192,6 @@ class Path:
 		
 		for i in range(len(self.steps) - 1):
 			for p in range(self.puzzle.cell_size):
-				#local_offset = max(0, min(1, i - (len(self.steps) - 1) + offset))
 				local_offset = offset
 				if i != len(self.steps) - 2:
 					local_offset = 0
@@ -211,7 +214,7 @@ class Path:
 				for y in range(3):
 					color = self.puzzle.path_color
 					if len(self.steps) == 1:
-						color = blend_colors(self.puzzle.path_color, self.puzzle.line_color, min(1, max(0, offset)))
+						color = blend_colors(self.puzzle.path_color, self.puzzle.line_color, offset)
 
 					self.screen.pixel[self.puzzle.offset.x + x + self.steps[0].x * self.puzzle.cell_size - 1][self.puzzle.offset.y + y + self.steps[0].y * self.puzzle.cell_size - 1] = color
 
@@ -291,9 +294,8 @@ class WitnessGame(Module):
 		super(WitnessGame, self).__init__(screen)
 		self.gamepad = gamepad
 		
-		self.puzzle = Puzzle(screen)
-		self.path = Path(self.puzzle, screen)		
-		
+		self.new_game()
+
 		self.gamepad.on_press.append(self.on_key_down)
 
 		self.key_queue = []
@@ -325,8 +327,16 @@ class WitnessGame(Module):
 		if key == 2:
 			if self.path.check():
 				self.screen.fade_out(0.4)
-				self.puzzle = Puzzle(self.screen)
-				self.path = Path(self.puzzle, self.screen)
+				self.new_game()
 				self.draw()
-				self.screen.fade_in(0.4)		
+				self.screen.fade_in(0.4)
+
+				self.path.offset_start = time.clock()
+				self.path.offset_end = self.path.offset_start + self.path.offset_time
+
+	def new_game(self):
+		self.puzzle = Puzzle(self.screen)
+		self.path = Path(self.puzzle, self.screen)
+		self.path.offset_start = time.clock()
+		self.path.offset_end = self.path.offset_start + self.path.offset_time
 			
