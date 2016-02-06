@@ -24,6 +24,20 @@ class MandatoryNode(AbstractPuzzleFeature):
 	def draw(self, screen):
 		screen.pixel[self.puzzle.offset.x + self.node.x * self.puzzle.cell_size][self.puzzle.offset.y + self.node.y * self.puzzle.cell_size] = darken_color(self.puzzle.line_color, 0.1)
 
+class ForbiddenEdge(AbstractPuzzleFeature):
+	def __init__(self, puzzle, node1, node2):
+		self.puzzle = puzzle
+		self.node1 = node1
+		self.node2 = node2
+
+	def check(self, path):
+		return not path.contains_edge(self.node1, self.node2)
+
+	def draw(self, screen):
+		for p in range(1, self.puzzle.cell_size):
+			position = Point(self.puzzle.offset.x + self.node1.x * self.puzzle.cell_size + (self.node2.x - self.node1.x) * p, self.puzzle.offset.y + self.node1.y * self.puzzle.cell_size + (self.node2.y - self.node1.y) * p)
+			screen.pixel[position.x][position.y] = self.puzzle.background_color
+
 class Puzzle:
 	def __init__(self, screen):
 		self.screen = screen
@@ -55,12 +69,30 @@ class Puzzle:
 		available_mandatory_nodes.remove(self.exit)
 
 		for i in range(total_features):
-			feature_type = random.randint(0, 0)
+			feature_type = random.randint(0, 1)
 
 			if feature_type == 0 and len(available_mandatory_nodes) > 0:
 				mandatory_node = random.choice(available_mandatory_nodes)
 				available_mandatory_nodes.remove(mandatory_node)
 				self.features.append(MandatoryNode(self, mandatory_node))
+
+			if feature_type == 1:
+				node1 = None
+				node2 = None
+
+				while True:
+					node1 = Point(random.randint(0, self.width - 2), random.randint(0, self.height - 2))
+					if bool(random.getrandbits(1)):
+						node2 = Point(node1.x, node1.y + 1)
+					else:
+						node2 = Point(node1.x + 1, node1.y)
+
+					if not self.solution.contains_edge(node1, node2):
+						break
+
+				self.features.append(ForbiddenEdge(self, node1, node2))
+
+
 
 	def draw(self, screen):
 		screen.clear(self.background_color)
