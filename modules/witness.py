@@ -6,8 +6,28 @@ import math
 from helpers import *
 from module import *
 
+class AbstractPuzzleFeature(object):
+	def draw(self, screen):
+		pass
+
+	def check(self, path):
+		pass
+
+class MandatoryNode(AbstractPuzzleFeature):
+	def __init__(self, puzzle, node):
+		self.node = node
+		self.puzzle = puzzle
+
+	def check(self, path):
+		return path.contains_node(self.node)
+
+	def draw(self, screen):
+		screen.pixel[self.puzzle.offset.x + self.node.x * self.puzzle.cell_size][self.puzzle.offset.y + self.node.y * self.puzzle.cell_size] = darken_color(self.puzzle.line_color, 0.1)
+
 class Puzzle:
-	def __init__(self):
+	def __init__(self, screen):
+		self.screen = screen
+
 		self.width = 5
 		self.height = 5
 		self.cell_size = 3
@@ -21,6 +41,26 @@ class Puzzle:
 		self.background_color = hsv_to_color(random.random(), 1, 0.4)
 		self.line_color = darken_color(self.background_color, 0.4)
 		self.path_color = brighten_color(self.background_color, 0.4)
+
+		self.solution = self.create_random_path(self.screen)
+		self.create_features()
+
+	def create_features(self):
+		self.features = []
+
+		total_features = random.randint(2, 8)
+
+		available_mandatory_nodes = list(self.solution.steps)
+		available_mandatory_nodes.remove(self.entry)
+		available_mandatory_nodes.remove(self.exit)
+
+		for i in range(total_features):
+			feature_type = random.randint(0, 0)
+
+			if feature_type == 0 and len(available_mandatory_nodes) > 0:
+				mandatory_node = random.choice(available_mandatory_nodes)
+				available_mandatory_nodes.remove(mandatory_node)
+				self.features.append(MandatoryNode(self, mandatory_node))
 
 	def draw(self, screen):
 		screen.clear(self.background_color)
@@ -42,6 +82,9 @@ class Puzzle:
 
 		screen.pixel[self.exit_on_screen.x][self.exit_on_screen.y] = self.line_color
 
+		for feature in self.features:
+			feature.draw(screen)
+
 	def create_random_path(self, screen):
 		# Start by making a simple path
 
@@ -61,7 +104,6 @@ class Puzzle:
 			path.extend()
 
 		return path
-		
 
 class Path:
 	def __init__(self, puzzle, screen):
@@ -119,11 +161,15 @@ class Path:
 				if i != len(self.steps) - 2:
 					local_offset = 0
 				pixel_offset = max(0, min(1, (1 - local_offset ) * (self.puzzle.cell_size) - p + 1))
-				color = blend_colors(self.puzzle.line_color, self.puzzle.path_color, pixel_offset)
-				self.screen.pixel[self.puzzle.offset.x + self.steps[i].x * self.puzzle.cell_size + (self.steps[i + 1].x - self.steps[i].x) * p][self.puzzle.offset.y + self.steps[i].y * self.puzzle.cell_size + (self.steps[i + 1].y - self.steps[i].y) * p] = color
+				
+				position = Point(self.puzzle.offset.x + self.steps[i].x * self.puzzle.cell_size + (self.steps[i + 1].x - self.steps[i].x) * p, self.puzzle.offset.y + self.steps[i].y * self.puzzle.cell_size + (self.steps[i + 1].y - self.steps[i].y) * p)
+				color = blend_colors(self.screen.pixel[position.x][position.y], self.puzzle.path_color, pixel_offset)
+				
+				self.screen.pixel[position.x][position.y] = color
 		
-		color = blend_colors(self.puzzle.line_color, self.puzzle.path_color, 1.0 -  min(1, max(0, offset * self.puzzle.cell_size)))
-		self.screen.pixel[self.puzzle.offset.x + self.steps[len(self.steps) - 1].x * self.puzzle.cell_size][self.puzzle.offset.y + self.steps[len(self.steps) - 1].y * self.puzzle.cell_size] = color
+		position = Point(self.puzzle.offset.x + self.steps[len(self.steps) - 1].x * self.puzzle.cell_size, self.puzzle.offset.y + self.steps[len(self.steps) - 1].y * self.puzzle.cell_size)
+		color = blend_colors(self.screen.pixel[position.x][position.y], self.puzzle.path_color, 1.0 -  min(1, max(0, offset * self.puzzle.cell_size)))
+		self.screen.pixel[position.x][position.y] = color
 
 		if self.steps[len(self.steps) -1] == self.puzzle.exit and offset == 0:
 			self.screen.pixel[self.puzzle.exit_on_screen.x][self.puzzle.exit_on_screen.y] = self.puzzle.path_color
@@ -202,12 +248,18 @@ class Path:
 		self.steps.insert(self.steps.index(entry) + 1, to_add[0])
 		self.steps.insert(self.steps.index(entry) + 2, to_add[1])
 
+	def check(self):
+		for feature in self.puzzle.features:
+			if not feature.check(self):
+				return False
+		return True
+
 class WitnessGame(Module):
 	def __init__(self, screen, gamepad):
 		super(WitnessGame, self).__init__(screen)
 		self.gamepad = gamepad
 		
-		self.puzzle = Puzzle()
+		self.puzzle = Puzzle(screen)
 		self.path = Path(self.puzzle, screen)		
 		
 		self.gamepad.on_press.append(self.on_key_down)
@@ -217,13 +269,13 @@ class WitnessGame(Module):
 	def draw(self):
 		self.puzzle.draw(self.screen)
 		self.path.draw()
-		self.screen.update()
 		
 	def tick(self):
 		if (len(self.key_queue) != 0):
 			self.handle_key(self.key_queue.pop(0))
 
-		self.draw()
+		self.draw()		
+		self.screen.update()
 		time.sleep(0.01)
 
 	def on_key_down(self, key):
@@ -239,4 +291,10 @@ class WitnessGame(Module):
 		if key == self.gamepad.RIGHT:
 			self.path.move(Point(1, 0))
 		if key == 2:
-			self.path = self.puzzle.create_random_path(self.screen)
+			if self.path.check():
+				self.screen.fade_out(0.4)
+				self.puzzle = Puzzle(self.screen)
+				self.path = Path(self.puzzle, self.screen)
+				self.draw()
+				self.screen.fade_in(0.4)		
+			
