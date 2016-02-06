@@ -284,6 +284,9 @@ class Path:
 		self.steps.insert(self.steps.index(entry) + 2, to_add[1])
 
 	def check(self):
+		if self.steps[len(self.steps) - 1] != self.puzzle.exit:
+			return False
+
 		for feature in self.puzzle.features:
 			if not feature.check(self):
 				return False
