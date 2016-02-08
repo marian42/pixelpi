@@ -76,6 +76,14 @@ class PieItem(MenuItem):
 		from modules.pie import Pie
 		return Pie(screen)
 
+class FireItem(MenuItem):
+	def __init__(self):
+		self.preview = MenuItem.load_preview('menu/preview/fire.bmp')
+
+	def get_module(self, screen, gamepad):
+		from modules.fire import Fire
+		return Fire(screen)
+
 class BrightnessItem(MenuItem):
 	def __init__(self, screen):
 		self.preview_template = MenuItem.load_preview('menu/preview/brightness.bmp')
@@ -119,7 +127,8 @@ def create_menu_items():
 		PacmanItem(),
 		ClockItem(),
 		PieItem(),
-		MusicItem()
+		MusicItem(),
+		FireItem()
 	]
 
 	if screen.screen.instance != None:
