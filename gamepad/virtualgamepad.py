@@ -5,6 +5,9 @@ from abstractgamepad import AbstractGamepad;
 
 instance = None
 
+class UnknownKeyException(Exception):
+	pass
+
 class VirtualGamepad(AbstractGamepad):	
 	def __init__(self, verbose = False):
 		super(VirtualGamepad, self).__init__(verbose)
@@ -33,15 +36,20 @@ class VirtualGamepad(AbstractGamepad):
 		for relation in self.keycode_list:
 			if (relation[0] == keycode):
 				return relation[1]
+		raise UnknownKeyException
 			
 	def tick(self):
 		for event in pygame.event.get():
 			self.consume_event(event)
 
 	def consume_event(self, event):
-		if event.type == pygame.KEYDOWN:
-			self.press(self.keycode_to_int(event.key))
-		if event.type == pygame.KEYUP:
-			self.release(self.keycode_to_int(event.key))
+		try:
+			if event.type == pygame.KEYDOWN:
+				self.press(self.keycode_to_int(event.key))
+			if event.type == pygame.KEYUP:
+				self.release(self.keycode_to_int(event.key))
+		except UnknownKeyException:
+			if event.type == pygame.KEYDOWN:
+				print("Unknown key pressed. Use arrow keys and number keys.")
 
 instance = VirtualGamepad()

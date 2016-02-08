@@ -14,6 +14,10 @@ class AbstractGamepad(object):
 		self.on_release = []
 		
 	def press(self, btn):
+		if not btn in range(self.btn_count):
+			print "Unknown button!"
+			return
+
 		self.button[btn] = True
 		if self.verbose:
 			print('Pressed ' + str(btn))
