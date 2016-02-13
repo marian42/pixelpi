@@ -105,10 +105,10 @@ class BrightnessItem(MenuItem):
 		menu.draw()
 
 	def on_key_press(self, key, menu):
-		if key == input.Key.UP:
+		if key == input.Key.UP or key == input.Key.ENTER:
 			self.screen.set_brightness(self.screen.get_brightness() + 1)
 			self.update(menu)
-		if key == input.Key.DOWN:
+		if key == input.Key.DOWN or key == input.Key.BACK:
 			self.screen.set_brightness(self.screen.get_brightness() - 1)
 			self.update(menu)
 

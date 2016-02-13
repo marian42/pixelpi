@@ -95,8 +95,10 @@ class Menu(object):
 		self.end = self.start + 0.3
 
 	def on_key_down(self, key):
+		self.items[self.index].on_key_press(key, self)
+		
 		if self.module != None:
-			if key == 10:
+			if key == input.Key.HOME or key == input.Key.BACK:
 				self.stop()
 			return
 
@@ -107,8 +109,6 @@ class Menu(object):
 		if key == input.Key.ENTER or key == input.Key.A:
 			self.launch()
 			return True
-
-		self.items[self.index].on_key_press(key, self)
 
 	def stop(self):
 		self.module.stop()
