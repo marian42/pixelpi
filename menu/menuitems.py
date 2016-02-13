@@ -37,6 +37,14 @@ class CycleItem(MenuItem):
 		from modules.cycle import Cycle
 		return Cycle(screen, 'animations')
 
+class GalleryItem(MenuItem):
+	def __init__(self):
+		self.preview = MenuItem.load_preview('menu/preview/gallery.bmp')
+
+	def get_module(self, screen):
+		from modules.gallery import Gallery
+		return Gallery(screen)
+
 class TetrisItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/tetris.bmp')
@@ -132,6 +140,7 @@ class WitnessItem(MenuItem):
 def create_menu_items():
 	menu_items = [
 		CycleItem(),
+		GalleryItem(),
 		TetrisItem(),
 		SnakeItem(),
 		PacmanItem(),
