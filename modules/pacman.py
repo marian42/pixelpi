@@ -7,6 +7,7 @@ from helpers import *
 from module import *
 import random
 from modules.animation import Animation
+import input
 
 class Ghost(object):
 	ROAM = 0
@@ -149,10 +150,9 @@ class Pacman(Module):
 	pacman_color = Color(255, 255, 0)
 	cherry_color = Color(255, 0, 0)
 
-	def __init__(self, screen, gamepad):
+	def __init__(self, screen):
 		super(Pacman, self).__init__(screen)
-		self.gamepad = gamepad
-		self.gamepad.on_press.append(self.on_key_down)
+		input.on_press.append(self.on_key_down)
 		
 		self.direction_maps = {}
 
@@ -297,13 +297,13 @@ class Pacman(Module):
 		time.sleep(0.005)
 		
 	def on_key_down(self, key):
-		if key == self.gamepad.UP:
+		if key == input.Key.UP:
 			self.new_dir = Point(0, -1)
-		if key == self.gamepad.DOWN:
+		if key == input.Key.DOWN:
 			self.new_dir = Point(0, 1)
-		if key == self.gamepad.LEFT:
+		if key == input.Key.LEFT:
 			self.new_dir = Point(-1, 0)
-		if key == self.gamepad.RIGHT:
+		if key == input.Key.RIGHT:
 			self.new_dir = Point(1, 0)
 
 	def create_direction_map(self, dest):

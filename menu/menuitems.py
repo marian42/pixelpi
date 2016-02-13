@@ -1,6 +1,7 @@
 import pygame.image
 from helpers import *
 import screen.screen
+import input
 
 class MenuItem(object):
 	PREVIEW_SIZE = 8
@@ -11,7 +12,7 @@ class MenuItem(object):
 	def get_preview(self):
 		return self.preview
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		raise NotImplementedError()
 
 	@staticmethod
@@ -32,39 +33,39 @@ class CycleItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/cycle.bmp')
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		from modules.cycle import Cycle
-		return Cycle(screen, gamepad, 'animations')
+		return Cycle(screen, 'animations')
 
 class TetrisItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/tetris.bmp')
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		from modules.tetris import Tetris
-		return Tetris(screen, gamepad)
+		return Tetris(screen)
 
 class SnakeItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/snake.bmp')
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		from modules.snake import Snake
-		return Snake(screen, gamepad)
+		return Snake(screen)
 
 class PacmanItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/pacman.bmp')
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		from modules.pacman import Pacman
-		return Pacman(screen, gamepad)
+		return Pacman(screen)
 
 class ClockItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/clock.bmp')
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		from modules.clock import Clock
 		return Clock(screen)
 
@@ -72,7 +73,7 @@ class PieItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/pie.bmp')
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		from modules.pie import Pie
 		return Pie(screen)
 
@@ -80,7 +81,7 @@ class FireItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/fire.bmp')
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		from modules.fire import Fire
 		return Fire(screen)
 
@@ -104,10 +105,10 @@ class BrightnessItem(MenuItem):
 		menu.draw()
 
 	def on_key_press(self, key, menu):
-		if key == menu.gamepad.UP:
+		if key == input.Key.UP:
 			self.screen.set_brightness(self.screen.get_brightness() + 1)
 			self.update(menu)
-		if key == menu.gamepad.DOWN:
+		if key == input.Key.DOWN:
 			self.screen.set_brightness(self.screen.get_brightness() - 1)
 			self.update(menu)
 
@@ -115,7 +116,7 @@ class MusicItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/music.bmp')
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		from modules.music import Music
 		return Music(screen)
 
@@ -123,9 +124,9 @@ class WitnessItem(MenuItem):
 	def __init__(self):
 		self.preview = MenuItem.load_preview('menu/preview/witness.bmp')
 
-	def get_module(self, screen, gamepad):
+	def get_module(self, screen):
 		from modules.witness import WitnessGame
-		return WitnessGame(screen, gamepad)
+		return WitnessGame(screen)
 
 
 def create_menu_items():

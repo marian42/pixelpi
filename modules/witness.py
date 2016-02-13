@@ -5,6 +5,7 @@ import os
 import math
 from helpers import *
 from module import *
+import input
 
 class AbstractPuzzleFeature(object):
 	def draw(self, screen):
@@ -470,13 +471,12 @@ class Path:
 		return self.zones
 
 class WitnessGame(Module):
-	def __init__(self, screen, gamepad):
+	def __init__(self, screen):
 		super(WitnessGame, self).__init__(screen)
-		self.gamepad = gamepad
 		
 		self.new_game()
 
-		self.gamepad.on_press.append(self.on_key_down)
+		input.on_press.append(self.on_key_down)
 
 		self.key_queue = []
 
@@ -503,15 +503,15 @@ class WitnessGame(Module):
 		self.key_queue.append(key)
 
 	def handle_key(self, key):		
-		if key == self.gamepad.UP:
+		if key == input.Key.UP:
 			self.path.move(Point(0, -1))
-		if key == self.gamepad.DOWN:
+		if key == input.Key.DOWN:
 			self.path.move(Point(0, 1))
-		if key == self.gamepad.LEFT:
+		if key == input.Key.LEFT:
 			self.path.move(Point(-1, 0))
-		if key == self.gamepad.RIGHT:
+		if key == input.Key.RIGHT:
 			self.path.move(Point(1, 0))
-		if key == 2:
+		if key == input.Key.A:
 			if len(self.path.steps) == 0:
 				self.wrong_path = None
 				self.path.start()
@@ -536,7 +536,7 @@ class WitnessGame(Module):
 				self.wrong_path.wrong_since = time.clock()
 				self.path = Path(self.puzzle, self.screen)
 
-		if key == 3 and len(self.path.steps) > 0:
+		if key == input.Key.B and len(self.path.steps) > 0:
 			self.path = Path(self.puzzle, self.screen)
 
 	def new_game(self):

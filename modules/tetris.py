@@ -5,6 +5,7 @@ import pygame
 import os
 import thread
 import math
+import input
 
 from thread import start_new_thread
 from modules.animation import *
@@ -62,9 +63,8 @@ class Tetris(Module):
 	
 	COOLDOWN = 0.03
 
-	def __init__(self, screen, gamepad):
+	def __init__(self, screen):
 		super(Tetris, self).__init__(screen)
-		self.gamepad = gamepad
 		
 		self.level_width = 10
 		self.level_height = 16
@@ -72,7 +72,7 @@ class Tetris(Module):
 		self.draw_lock = thread.allocate_lock()
 		self.game_lock = thread.allocate_lock()
 		
-		self.gamepad.on_press.append(self.enqueue_key)
+		input.on_press.append(self.enqueue_key)
 		self.lastinput = 0
 		
 		self.new_game()
@@ -230,7 +230,7 @@ class Tetris(Module):
 			
 	def on_key_down(self, button):
 		with self.game_lock:
-			if button == 4 or button == self.gamepad.UP:
+			if button == input.Key.Y or button == input.Key.UP:
 				center = Point(self.tetromino_pos.x + self.current_tetromino.width / 2, self.tetromino_pos.y + self.current_tetromino.height / 2)
 				rotated = self.current_tetromino.rotate()
 				new_pos = Point(center.x - rotated.width / 2, center.y - rotated.height / 2)
@@ -240,14 +240,14 @@ class Tetris(Module):
 					self.lastinput = time.clock()
 					self.draw_and_update()
 					
-			if button == 2:
+			if button == input.Key.A:
 				while self.fits(self.current_tetromino, Point(self.tetromino_pos.x, self.tetromino_pos.y + 1)):
 					self.tetromino_pos = Point(self.tetromino_pos.x, self.tetromino_pos.y + 1)
 				self.step()
 				self.draw_and_update()
 			
 			self.check_keys(keydown = True)
-		if button == 10:
+		if button == input.Key.SELECT:
 			self.new_game()
 			
 	def get_full_lines(self):
@@ -290,21 +290,21 @@ class Tetris(Module):
 		self.next_step = time.clock()
 				
 	def check_keys(self, keydown = False):
-		if self.gamepad.button[self.gamepad.LEFT] and time.clock() - self.lastinput > self.COOLDOWN:
+		if input.key_state[input.Key.LEFT] and time.clock() - self.lastinput > self.COOLDOWN:
 			if self.fits(self.current_tetromino, Point(self.tetromino_pos.x - 1, self.tetromino_pos.y)):
 				self.tetromino_pos = Point(self.tetromino_pos.x - 1, self.tetromino_pos.y)
 				self.lastinput = time.clock()
 				if keydown:
 					self.lastinput += self.COOLDOWN * 1.5
 				self.draw_and_update()
-		if self.gamepad.button[self.gamepad.RIGHT] and time.clock() - self.lastinput > self.COOLDOWN:
+		if input.key_state[input.Key.RIGHT] and time.clock() - self.lastinput > self.COOLDOWN:
 			if self.fits(self.current_tetromino, Point(self.tetromino_pos.x + 1, self.tetromino_pos.y)):
 				self.tetromino_pos = Point(self.tetromino_pos.x + 1, self.tetromino_pos.y)
 				self.lastinput = time.clock()
 				if keydown:
 					self.lastinput += self.COOLDOWN	* 1.5		
 				self.draw_and_update()
-		if self.gamepad.button[self.gamepad.DOWN] and time.clock() - self.lastinput > self.COOLDOWN:
+		if input.key_state[input.Key.DOWN] and time.clock() - self.lastinput > self.COOLDOWN:
 			if self.fits(self.current_tetromino, Point(self.tetromino_pos.x, self.tetromino_pos.y + 1)):
 				self.tetromino_pos = Point(self.tetromino_pos.x, self.tetromino_pos.y + 1)
 				self.lastinput = time.clock()
