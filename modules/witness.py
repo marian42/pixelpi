@@ -98,12 +98,16 @@ class Puzzle:
 		self.offset = Point(2 if self.entry.x == 0 else 1, 2 if self.entry.y == 0 else 1)
 		self.exit_on_screen = Point(self.offset.x + self.exit.x * self.cell_size, self.offset.y + self.exit.y * self.cell_size + (-1 if self.exit.y == 0 else 1))
 
-		self.background_color = hsv_to_color(random.random(), 1, 0.4)
-		self.line_color = darken_color(self.background_color, 0.3)
-		self.path_color = brighten_color(self.background_color, 0.4)
+		self.hue = random.random()
+		self.background_color = hsv_to_color(self.hue, 0.9, 0.5)
+		self.path_color = hsv_to_color(self.hue, 0.35, 1.0)
+		self.line_color = hsv_to_color(self.hue, 1.0, 0.15)
 
 		self.solution = self.create_random_path(self.screen)
 		self.create_features()
+
+	def solve(self):
+		self.path_color = hsv_to_color(self.hue, 0.0, 1)
 
 	def create_features(self):
 		self.features = []
@@ -198,6 +202,7 @@ class Puzzle:
 		random.shuffle(steps)
 
 		path = Path(self, screen)
+		path.start()
 		for step in steps:
 			path.steps.append(Point(path.steps[len(path.steps) - 1].x + step.x, path.steps[len(path.steps) - 1].y + step.y))
 
@@ -211,11 +216,14 @@ class Path:
 	def __init__(self, puzzle, screen):
 		self.puzzle = puzzle
 		self.screen = screen
-		self.steps = [puzzle.entry]
+		self.steps = []
 
 		self.offset_time = 0.2
 		self.offset_start = time.clock()
 		self.offset_end = self.offset_start + self.offset_time
+
+		self.wrong = False
+		self.wrong_since = None
 
 	def animate_undo(self):
 		self.offset_end = time.clock()
@@ -227,11 +235,18 @@ class Path:
 			self.draw()
 			self.screen.update()
 
-		self.offset_end = time.clock()
-		self.offset_start = self.offset_end - 1
+		self.offset_start = self.offset_end - self.offset_time
 
+	def start(self):
+		self.steps = [self.puzzle.entry]
+
+		self.offset_start = time.clock()
+		self.offset_end = self.offset_start + self.offset_time
 		
 	def move(self, direction):
+		if len(self.steps) == 0:
+			return
+
 		if abs(direction.x) + abs(direction.y) != 1:
 			return
 
@@ -254,8 +269,22 @@ class Path:
 		self.steps.append(next)
 
 	def draw(self):
+		if len(self.steps) == 0:
+			return
+
 		offset = 1.0 - min(1, max(0, (time.clock() - self.offset_start) / (self.offset_end - self.offset_start)))
 		
+		path_color = self.puzzle.path_color
+		if self.wrong:
+			path_color = Color(0, 0, 0)
+
+		if self.steps[len(self.steps) - 1] == self.puzzle.exit and offset == 0 and not self.wrong:
+			path_color = blend_colors(Color(255, 255, 255), path_color, math.sin(time.clock() * 8) ** 2)
+
+		opacity = 1
+		if self.wrong_since != None:
+			opacity = 1.0 - min(1, (time.clock() - self.wrong_since) / 4.0)
+
 		for i in range(len(self.steps) - 1):
 			for p in range(self.puzzle.cell_size):
 				local_offset = offset
@@ -264,25 +293,40 @@ class Path:
 				pixel_offset = max(0, min(1, (1 - local_offset ) * (self.puzzle.cell_size) - p + 1))
 				
 				position = Point(self.puzzle.offset.x + self.steps[i].x * self.puzzle.cell_size + (self.steps[i + 1].x - self.steps[i].x) * p, self.puzzle.offset.y + self.steps[i].y * self.puzzle.cell_size + (self.steps[i + 1].y - self.steps[i].y) * p)
-				color = blend_colors(self.screen.pixel[position.x][position.y], self.puzzle.path_color, pixel_offset)
+				color = blend_colors(self.screen.pixel[position.x][position.y], path_color, pixel_offset)
 				
+				if opacity != 1:
+					color = blend_colors(self.screen.pixel[position.x][position.y], color, opacity)
+
 				self.screen.pixel[position.x][position.y] = color
 		
 		position = Point(self.puzzle.offset.x + self.steps[len(self.steps) - 1].x * self.puzzle.cell_size, self.puzzle.offset.y + self.steps[len(self.steps) - 1].y * self.puzzle.cell_size)
-		color = blend_colors(self.screen.pixel[position.x][position.y], self.puzzle.path_color, 1.0 -  min(1, max(0, offset * self.puzzle.cell_size)))
+		color = blend_colors(self.screen.pixel[position.x][position.y], path_color, 1.0 -  min(1, max(0, offset * self.puzzle.cell_size)))
+		if opacity != 1:
+			color = blend_colors(self.screen.pixel[position.x][position.y], color, opacity)
 		self.screen.pixel[position.x][position.y] = color
 
 		if self.steps[len(self.steps) -1] == self.puzzle.exit and offset == 0:
-			self.screen.pixel[self.puzzle.exit_on_screen.x][self.puzzle.exit_on_screen.y] = self.puzzle.path_color
+			color = path_color
+
+			if opacity != 1:
+				color = blend_colors(self.screen.pixel[self.puzzle.exit_on_screen.x][self.puzzle.exit_on_screen.y], color, opacity)
+
+			self.screen.pixel[self.puzzle.exit_on_screen.x][self.puzzle.exit_on_screen.y] = color
 
 		if len(self.steps) > 0:
 			for x in range(3):
 				for y in range(3):
-					color = self.puzzle.path_color
+					color = path_color
 					if len(self.steps) == 1:
-						color = blend_colors(self.puzzle.path_color, self.puzzle.line_color, offset)
+						color = blend_colors(path_color, self.puzzle.line_color, offset)
 
-					self.screen.pixel[self.puzzle.offset.x + x + self.steps[0].x * self.puzzle.cell_size - 1][self.puzzle.offset.y + y + self.steps[0].y * self.puzzle.cell_size - 1] = color
+					pos = Point(self.puzzle.offset.x + x + self.steps[0].x * self.puzzle.cell_size - 1, self.puzzle.offset.y + y + self.steps[0].y * self.puzzle.cell_size - 1)
+
+					if opacity != 1:
+						color = blend_colors(self.screen.pixel[pos.x][pos.y], color, opacity)
+
+					self.screen.pixel[pos.x][pos.y] = color
 
 	def contains_node(self, point):
 		for step in self.steps:
@@ -402,11 +446,18 @@ class WitnessGame(Module):
 		self.gamepad.on_press.append(self.on_key_down)
 
 		self.key_queue = []
+
+		self.wrong_path = None
+
+		self.draw()
+		self.screen.fade_in(0.4)
 	
 	def draw(self):
 		self.puzzle.draw(self.screen)
 		self.path.draw()
-		
+		if self.wrong_path != None and len(self.path.steps) == 0:
+			self.wrong_path.draw()
+
 	def tick(self):
 		if (len(self.key_queue) != 0):
 			self.handle_key(self.key_queue.pop(0))
@@ -428,7 +479,17 @@ class WitnessGame(Module):
 		if key == self.gamepad.RIGHT:
 			self.path.move(Point(1, 0))
 		if key == 2:
+			if len(self.path.steps) == 0:
+				self.wrong_path = None
+				self.path.start()
+				return
+
 			if self.path.check():
+				self.puzzle.solve()
+				self.draw()
+				self.screen.update()
+				time.sleep(1)
+
 				self.screen.fade_out(0.4)
 				self.new_game()
 				self.draw()
@@ -436,12 +497,17 @@ class WitnessGame(Module):
 
 				self.path.offset_start = time.clock()
 				self.path.offset_end = self.path.offset_start + self.path.offset_time
-		if key == 3:
+			else:
+				self.wrong_path = self.path
+				self.wrong_path.wrong = True
+				self.wrong_path.wrong_since = time.clock()
+				self.path = Path(self.puzzle, self.screen)
+
+		if key == 3 and len(self.path.steps) > 0:
 			self.path = Path(self.puzzle, self.screen)
 
 	def new_game(self):
 		self.puzzle = Puzzle(self.screen)
 		self.path = Path(self.puzzle, self.screen)
-		self.path.offset_start = time.clock()
-		self.path.offset_end = self.path.offset_start + self.path.offset_time
+		self.errors = []
 			
