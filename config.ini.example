@@ -5,3 +5,5 @@ brightness = 5
 [menu]
 defaultitemindex = 0
 
+[debug]
+verboseinput = false

@@ -2,18 +2,16 @@ import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 from menu.menuitems import create_menu_items
 from screenfactory import create_screen
-from gamepadfactory import create_gamepad
-import pygame
 import time
 import math
 from helpers import *
 import config
+import input
 
 class Menu(object):
 	def __init__(self, screen, items):
 		self.screen = screen
-		self.gamepad = create_gamepad()
-		self.gamepad.on_press.append(self.on_key_down)
+		input.on_press.append(self.on_key_down)
 
 		self.index = config.default_item_index
 		self.items = items
@@ -21,8 +19,8 @@ class Menu(object):
 
 		self.reset(redraw = False)
 		self.resume_animation()
-
-		if not self.gamepad.available():
+		
+		if len(input.available_input_methods) == 0:
 			self.launch()
 
 	def reset(self, redraw = True):
@@ -77,7 +75,7 @@ class Menu(object):
 		return x
 
 	def tick(self):
-		self.gamepad.tick()
+		input.tick()
 		if (self.dir != 0):
 			self.offset = self.dir * self.ease((1 - (time.clock() - self.start) / (self.end - self.start)))
 			
@@ -102,11 +100,11 @@ class Menu(object):
 				self.stop()
 			return
 
-		if key == self.gamepad.RIGHT:
+		if key == input.Key.RIGHT:
 			self.move(1)
-		if key == self.gamepad.LEFT:
+		if key == input.Key.LEFT:
 			self.move(-1)
-		if key == 2:
+		if key == input.Key.ENTER or key == input.Key.A:
 			self.launch()
 			return True
 
@@ -117,14 +115,14 @@ class Menu(object):
 		self.screen.fade_out(0.3)
 		self.module = None
 		self.resume_animation()
-		self.gamepad.on_press = [self.on_key_down]
-		self.gamepad.on_release = []
+		input.on_press = [self.on_key_down]
+		input.on_release = []
 
 	def launch(self):
 		if self.items[self.index].is_launchable() == False:
 			return
 		self.start_animation()
-		self.module = self.items[self.index].get_module(self.screen, self.gamepad)
+		self.module = self.items[self.index].get_module(self.screen)
 		self.module.start()
 
 	def start_animation(self):
@@ -136,7 +134,7 @@ class Menu(object):
 			self.brightness = min(1, 1 - ((time.clock() - start) / (end - start)))
 			self.draw()
 
-		pygame.time.wait(100)
+		time.sleep(0.1)
 		self.reset(redraw = False)
 
 	def resume_animation(self):
@@ -155,4 +153,4 @@ if __name__ == '__main__':
 	menu = Menu(create_screen(), create_menu_items())
 	while True:
 		menu.tick()
-		pygame.time.wait(10)
+		time.sleep(0.01)
