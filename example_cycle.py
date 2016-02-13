@@ -6,7 +6,7 @@ import config
 
 screen = create_screen()
 
-cycle = Cycle(screen, None, 'animations')
+cycle = Cycle(screen, 'animations')
 cycle.start()
 
 while True:
