@@ -26,4 +26,5 @@ def check():
 	if GPIO.input(pin_back) == key_state[Key.BACK]:
 		switch(Key.BACK)
 
-on_tick.append(check)	
+on_tick.append(check)
+available_input_methods.append("buttons")
