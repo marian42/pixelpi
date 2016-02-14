@@ -36,13 +36,18 @@ class Puzzle:
 	def create_features(self):
 		self.features = []
 
-		total_features = random.randint(2, 8)
-
+		
 		available_mandatory_nodes = list(self.solution.steps)
 		available_mandatory_nodes.remove(self.entry)
 		available_mandatory_nodes.remove(self.exit)
 
 		available_mandatory_edges = [(self.solution.steps[i], self.solution.steps[i + 1]) for i in range(1, len(self.solution.steps) - 1)]
+
+		zones = self.solution.get_zones()
+
+		total_features = random.randint(2, 8)
+		if self.solution.zone_count == 1:
+			total_features += 5
 
 		for i in range(total_features):
 			feature_type = random.randint(0, 2)
@@ -73,24 +78,25 @@ class Puzzle:
 				available_mandatory_edges.remove(mandatory_edge)
 				self.features.append(MandatoryEdge(self, mandatory_edge[0], mandatory_edge[1]))
 
-		zones = self.solution.get_zones()
 		if self.solution.zone_count > 1:
-			found_white = False
-			found_black = False
-
 			colorblocks = ColorBlocks(self)
-			for i in range(random.randint(4, 10)):
+
+			for zone in range(self.solution.zone_count):
+				blocks = []
+				for x in range(self.width - 1):
+					for y in range(self.height - 1):
+						if zones[x][y] == zone:
+							blocks.append(Point(x,y))
+
+				p = random.choice(blocks)
+				colorblocks.colors[p.x][p.y] = Color(0, 0, 0) if zones[p.x][p.y] % 2 == 0 else Color(255, 255, 255)
+
+
+			for i in range(random.randint(0, 8)):
 				p = Point(random.randint(0, self.width - 2), random.randint(0, self.height - 2))
-
-				if zones[p.x][p.y] % 2 == 0:
-					found_black = True
-				else:
-					found_white = True
-
 				colorblocks.colors[p.x][p.y] = Color(0, 0, 0) if zones[p.x][p.y] % 2 == 0 else Color(255, 255, 255)
 			
-			if found_white and found_black:
-				self.features.append(colorblocks)
+			self.features.append(colorblocks)
 
 	def draw(self, screen):
 		screen.clear(self.background_color)
@@ -131,7 +137,7 @@ class Puzzle:
 			path.steps.append(Point(path.steps[len(path.steps) - 1].x + step.x, path.steps[len(path.steps) - 1].y + step.y))
 
 		# Randomly extend the path
-		for i in range(random.randint(0, 9)):
+		for i in range(random.randint(4, 10)):
 			path.extend()
 
 		return path
