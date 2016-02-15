@@ -86,9 +86,6 @@ class Menu(object):
 			self.draw()
 
 	def move(self, direction):
-		if self.dir != 0:
-			return
-
 		self.index = (self.index + direction + len(self.items)) % len(self.items)
 		self.dir = direction
 		self.start = time.clock()
@@ -121,6 +118,10 @@ class Menu(object):
 	def launch(self):
 		if self.items[self.index].is_launchable() == False:
 			return
+
+		self.offset = 0
+		self.dir = 0
+
 		self.start_animation()
 		self.module = self.items[self.index].get_module(self.screen)
 		self.module.start()
