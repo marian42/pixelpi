@@ -1,7 +1,7 @@
 import time
 import math
 from helpers import *
-from modules.module import Module
+from modules import Module
 import serial
 from thread import start_new_thread
 

@@ -3,7 +3,7 @@ import time
 import math
 from helpers import *
 from modules.animation import Animation
-from modules.module import *
+from modules import Module
 import input
 
 from ghost import *

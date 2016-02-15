@@ -4,7 +4,7 @@ import time
 import os
 import math
 from helpers import *
-from module import *
+from modules import *
 import input
 
 def random_color():

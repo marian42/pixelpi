@@ -3,7 +3,7 @@ import pygame.image
 import time
 import ConfigParser
 from helpers import *
-from module import Module
+from modules import Module
 
 class Animation(Module):
 	def __init__(self, screen, folder, interval = None, autoplay = True):

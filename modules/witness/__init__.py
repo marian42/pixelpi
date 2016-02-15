@@ -1,4 +1,4 @@
-from modules.module import *
+from modules import Module
 import input
 
 from puzzle import *

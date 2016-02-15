@@ -1,7 +1,7 @@
 import time
 import math
 from helpers import *
-from module import Module
+from modules import Module
 from noise import snoise2
 
 class PaletteStop:

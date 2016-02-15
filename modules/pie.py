@@ -1,7 +1,7 @@
 import time
 import math
 from helpers import *
-from module import Module
+from modules import Module
 
 class Pie(Module):
 	def __init__(self, screen):
