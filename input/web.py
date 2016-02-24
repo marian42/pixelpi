@@ -11,7 +11,7 @@ log.setLevel(logging.ERROR)
 def index():
 	return app.send_static_file('input/keys.html')
 
-@app.route("/key/<id>")
+@app.route("/key/<id>", methods=['POST'])
 def key(id):
 	press(int(id))
 	release(int(id))

@@ -84,7 +84,7 @@
 
 		function click(button) {
 			var request = new XMLHttpRequest();
-			request.open("GET", "/key/" + button, true);
+			request.open("POST", "/key/" + button, true);
 			request.send();
 		}
 	</script>
