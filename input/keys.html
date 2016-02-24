@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<title>Pixelpi Controller</title>
+	</head>
+
+	<style>
+		body {
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			background-color: black;
+		}
+
+		.button {
+			fill: white;
+		}
+		.button:active {
+			fill: gray;
+		}
+		.fullscreen {
+			fill: rgb(60,60,60);
+		}		
+		.home {
+			fill: black;
+			font-size: 0.8px;
+			font-family: sans-serif;
+			cursor: default;
+		}
+
+		svg {
+			width: 100%;
+			position: absolute;
+			bottom: 0px;
+		}
+	</style>
+
+	<body>
+		<svg viewbox="0.7 0 16.65 7.4">
+			<path d="M3.8,4 l-1,-1 l-2,0 l0,2 l2,0" class="button" onmousedown="click(13);"/>
+			<path d="M4,3.8 l-1,-1 l0,-2 l2,0 l0,2" class="button" onmousedown="click(11);"/>
+			<path d="M4.2,4 l1,-1 l2,0 l0,2 l-2,0" class="button" onmousedown="click(14);"/>
+			<path d="M4,4.2 l-1,1 l0,2 l2,0 l0,-2" class="button" onmousedown="click(12);"/>
+
+			<circle cx="12" cy="4" r="1.25" class="button" onmousedown="click(1);"/>
+			<circle cx="16" cy="4" r="1.25" class="button" onmousedown="click(3);"/>
+			<circle cx="14" cy="2" r="1.25" class="button" onmousedown="click(4);"/>
+			<circle cx="14" cy="6" r="1.25" class="button" onmousedown="click(2);"/>
+
+			<g class="button" onmousedown="click(10);">
+				<rect x="7" y="0.4" rx="0.75" ry="0.75" width="4" height="1.5"/>
+				<text x="9" y="1.45" text-anchor="middle" class="home">HOME</text>
+			</g>
+
+			<rect x="8.5" y="6" rx="0.15" ry="0.15" width="1" height="1" class="button fullscreen" onclick="toggleFullscreen();"/>
+		</svg>
+	</body>
+
+	<script>
+		function toggleFullscreen() {
+			if ((document.fullScreenElement && document.fullScreenElement !== null) ||    
+			   (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+			    if (document.documentElement.requestFullScreen) {  
+			      document.documentElement.requestFullScreen();  
+			    } else if (document.documentElement.mozRequestFullScreen) {  
+			      document.documentElement.mozRequestFullScreen();  
+			    } else if (document.documentElement.webkitRequestFullScreen) {  
+			      document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);  
+			    }  
+			  } else {  
+			    if (document.cancelFullScreen) {  
+			      document.cancelFullScreen();  
+			    } else if (document.mozCancelFullScreen) {  
+			      document.mozCancelFullScreen();  
+			    } else if (document.webkitCancelFullScreen) {  
+			      document.webkitCancelFullScreen();  
+			    }  
+  			}  
+		}
+
+		function click(button) {
+			var request = new XMLHttpRequest();
+			request.open("GET", "/key/" + button, true);
+			request.send();
+		}
+	</script>
+</html>

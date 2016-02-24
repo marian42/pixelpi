@@ -1,6 +1,7 @@
 [hardware]
 virtualhardware = false
 usebuttons = false
+useweb = false
 brightness = 5
 
 [menu]

@@ -52,3 +52,5 @@ if config.use_keyboard:
 	import input.keyboard
 if config.use_buttons:
 	import input.buttons
+if config.use_web:
+	import web

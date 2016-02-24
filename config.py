@@ -12,6 +12,7 @@ brightness = config.getint('hardware', 'brightness')
 use_keyboard = virtual_hardware
 use_gamepad = not virtual_hardware
 use_buttons = config.getboolean('hardware', 'usebuttons')
+use_web = config.getboolean('hardware', 'useweb')
 verbose_input = config.getboolean('debug', 'verboseinput')
 
 # Only store values that are supposed to be changes
