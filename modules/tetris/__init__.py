@@ -210,7 +210,7 @@ class Tetris(Module):
 				self.step()
 				self.draw_and_update()
 			
-			self.check_keys(keydown = True)
+			self.check_keys(keydown = True, override_left = button == input.Key.LEFT, override_right = button == input.Key.RIGHT, override_down = button == input.Key.DOWN)
 		if button == input.Key.SELECT:
 			self.new_game()
 			
@@ -253,22 +253,22 @@ class Tetris(Module):
 
 		self.next_step = time.clock()
 				
-	def check_keys(self, keydown = False):
-		if input.key_state[input.Key.LEFT] and time.clock() - self.lastinput > self.COOLDOWN:
+	def check_keys(self, keydown = False, override_left = False, override_right = False, override_down = False):
+		if (input.key_state[input.Key.LEFT] or override_left) and time.clock() - self.lastinput > self.COOLDOWN:
 			if self.fits(self.current_tetromino, Point(self.tetromino_pos.x - 1, self.tetromino_pos.y)):
 				self.tetromino_pos = Point(self.tetromino_pos.x - 1, self.tetromino_pos.y)
 				self.lastinput = time.clock()
 				if keydown:
 					self.lastinput += self.COOLDOWN * 1.5
 				self.draw_and_update()
-		if input.key_state[input.Key.RIGHT] and time.clock() - self.lastinput > self.COOLDOWN:
+		if (input.key_state[input.Key.RIGHT] or override_right) and time.clock() - self.lastinput > self.COOLDOWN:
 			if self.fits(self.current_tetromino, Point(self.tetromino_pos.x + 1, self.tetromino_pos.y)):
 				self.tetromino_pos = Point(self.tetromino_pos.x + 1, self.tetromino_pos.y)
 				self.lastinput = time.clock()
 				if keydown:
 					self.lastinput += self.COOLDOWN	* 1.5		
 				self.draw_and_update()
-		if input.key_state[input.Key.DOWN] and time.clock() - self.lastinput > self.COOLDOWN:
+		if (input.key_state[input.Key.DOWN] or override_down) and time.clock() - self.lastinput > self.COOLDOWN:
 			if self.fits(self.current_tetromino, Point(self.tetromino_pos.x, self.tetromino_pos.y + 1)):
 				self.tetromino_pos = Point(self.tetromino_pos.x, self.tetromino_pos.y + 1)
 				self.lastinput = time.clock()
