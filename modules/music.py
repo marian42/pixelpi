@@ -12,13 +12,10 @@ class Music(Module):
 		self.data = [0 for i in range(7)]
 		self.position = 0
 		start_new_thread(self.check_serial, ())
-		self.last_frame = time.time()
-		self.delta_t = 0
-		self.colors = [hsv_to_color(x / 16.0, 1, 1) for x in range(16)]
-		self.inertia = [0 for x in range(16)]
 
 	def check_serial(self):
 		while self.running:
+			time.sleep(0.1)
 			try:
 				byte = ord(self.serial.read())
 				if byte == 255:
@@ -26,35 +23,20 @@ class Music(Module):
 				elif self.position < 7:
 					self.data[self.position] = byte
 					self.position += 1
-			except:
-				pass
+			except Exception as e:
+				print e
 	
 	def tick(self):
 		self.draw()
 
-		now = time.time()
-		self.delta_t = now - self.last_frame
-		self.last_frame = now
-
-	def get_value(self, index):
-		pos = index * 6.0 / 15.0
-		fraction = pos % 1.0
-		if fraction < 0.01:
-			return self.data[int(pos)]
-		lower = int(math.floor(pos))
-		upper = int(math.ceil(pos))
-		return self.data[lower] * fraction + self.data[upper] * (1 - fraction)
-
 	def draw(self):
 		self.screen.clear()
-		for x in range(16):
-			value = self.get_value(x) * 16.0 / 254.0
-			for y in range(int(value)):
-				self.screen.pixel[x][15 - y] = self.colors[x]
-			self.inertia[x] = max(self.inertia[x], value)
-			if int(self.inertia[x]) < 16:
-				self.screen.pixel[x][15 - int(self.inertia[x])] = Color(255, 255, 255)
-			self.inertia[x] -= self.delta_t * 15
+
+		for channel in range(7):
+			self.screen.pixel[channel][0] = Color(self.data[channel], self.data[channel], self.data[channel])
+		if sum(self.data) == 0:
+			self.screen.pixel[7][0] = Color(255, 0, 0)
+		print ", ".join([str(self.data[c]) for c in range(7)])
 
 		self.screen.update()
 
