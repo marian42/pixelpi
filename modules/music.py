@@ -15,11 +15,11 @@ class Music(Module):
 
 	def check_serial(self):
 		while self.running:
-			time.sleep(0.1)
 			try:
 				byte = ord(self.serial.read())
 				if byte == 255:
 					self.position = 0
+					print ", ".join([str(self.data[c]) for c in range(7)])
 				elif self.position < 7:
 					self.data[self.position] = byte
 					self.position += 1
@@ -36,8 +36,7 @@ class Music(Module):
 			self.screen.pixel[channel][0] = Color(self.data[channel], self.data[channel], self.data[channel])
 		if sum(self.data) == 0:
 			self.screen.pixel[7][0] = Color(255, 0, 0)
-		print ", ".join([str(self.data[c]) for c in range(7)])
-
+		
 		self.screen.update()
 
 	def on_stop(self):
