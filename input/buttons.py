@@ -1,12 +1,12 @@
 import RPi.GPIO as GPIO
 from input import *
 
-pin_left = 23
-pin_right = 22
-pin_enter = 24
-pin_back = 21
+pin_left = 24
+pin_right = 23
+pin_enter = 22
+pin_back = 27
 
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
 for pin in [pin_left, pin_right, pin_enter, pin_back]:
 	GPIO.setup(pin, GPIO.IN)
